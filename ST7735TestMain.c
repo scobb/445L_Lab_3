@@ -40,6 +40,7 @@
 #include "inc/tm4c123gh6pm.h"
 #include "SetTime.h"
 #include "Clock.h"
+#include "DigitalDisplay.h"
 
 void DelayWait10ms(uint32_t n);
 
@@ -55,6 +56,7 @@ int main(void){
   Output_Init();								// initializes ST7735 display
 	SetTime_Init();								// initializes edge-triggered interrupts for PF0, PF1, active LOW
 	Clock_Init();									// starts clock--will print to the screen for now
+	enableDigitalDisplay();
   EnableInterrupts();           // (i) Clears the I bit
 	/*draw1(13, 50);
 	draw2(45, 50);

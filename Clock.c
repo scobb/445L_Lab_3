@@ -19,7 +19,9 @@ void increment_time(){
 			}
 		}
 	}
-	printf("%02d:%02d:%02d\n", time_hours, time_minutes, time_seconds);
+}
+void Clock_setDisplayFunction(void(*task)(void)){
+	setHandler(task);
 }
 void Clock_Init(){
 	

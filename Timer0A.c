@@ -49,6 +49,7 @@ long StartCritical (void);    // previous I bit, disable interrupts
 void EndCritical(long sr);    // restore I bit to previous value
 void WaitForInterrupt(void);  // low power mode
 void (*PeriodicTask)(void);   // user function
+void (*DisplayTask)(void);   // user function
 
 // ***************** Timer0A_Init ****************
 // Activate Timer0A interrupts to run user task periodically
@@ -71,10 +72,14 @@ void Timer0A_Init(void(*task)(void), uint32_t period){long sr;
   TIMER0_CTL_R |= 0x00000001;      // 10) enable timer0A
   EndCritical(sr);
 }
+void setHandler(void(*task)(void)){
+	DisplayTask = task;
+}
 
 void Timer0A_Handler(void){
-  PF4 = 0x10;
   TIMER0_ICR_R = TIMER_ICR_TATOCINT;// acknowledge timer0A timeout
   (*PeriodicTask)();                // execute user task
-	PF4 = 0x00;
+	if (DisplayTask) {
+		(*DisplayTask)();
+	}
 }
