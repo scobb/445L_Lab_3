@@ -480,11 +480,18 @@ const uint16_t Logo[] = {
 //        color 16­bit color, which can be produced by ST7735_Color565()   
 // Output: none  
 
+void DisableInterrupts(void); // Disable interrupts
+void EnableInterrupts(void);  // Enable interrupts
+long StartCritical (void);    // previous I bit, disable interrupts
+void EndCritical(long sr);    // restore I bit to previous value
+void WaitForInterrupt(void);  // low power mode
+
 int main(void){
-  PLL_Init();
-  Output_Init();
-	SetTime_Init();
-	Clock_Init();
+  PLL_Init();										// initializes phase lock loop, set clcok to 80MHz
+  Output_Init();								// initializes ST7735 display
+	SetTime_Init();								// initializes edge-triggered interrupts for PF0, PF1, active LOW
+	Clock_Init();									// starts clock--will print to the screen for now
+  EnableInterrupts();           // (i) Clears the I bit
 	/*draw1(13, 50);
 	draw2(45, 50);
 	draw3(85, 50);

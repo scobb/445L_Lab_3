@@ -6,17 +6,17 @@
 void drawHorizontalSegment(uint16_t x, uint16_t y){
 	/*
 	args:
-	(x, y) describes the top left point of any segment
+	(x, y) describes the top right point of any segment
 	*/
 	uint16_t x2;
-	x2 = x + DELTA_X;
+	x2 = x - DELTA_X;
   ST7735_Line(x, y, x2, y, ST7735_WHITE);
 }
 
 void drawVerticalSegment(uint16_t x, uint16_t y){
 	/*
 	args:
-	(x, y) describes the top left point of any segment
+	(x, y) describes the top right point of any segment
 	*/
 	uint16_t y2 = y + DELTA_Y;
   ST7735_Line(x, y, x, y2, ST7735_WHITE);
@@ -25,57 +25,57 @@ void drawVerticalSegment(uint16_t x, uint16_t y){
 void drawSeg1(uint16_t x, uint16_t y){
 	/*
 	args:
-	(x, y) describes the top left point of the seven segment display
+	(x, y) describes the top right point of the seven segment display
 	*/
 	drawHorizontalSegment(x, y);
 }
 void drawSeg4(uint16_t x, uint16_t y){
 	/*
 	args:
-	(x, y) describes the top left point of the seven segment display
+	(x, y) describes the top right point of the seven segment display
 	*/
 	drawHorizontalSegment(x, y+2*DELTA_Y);
 }
 void drawSeg7(uint16_t x, uint16_t y){
 	/*
 	args:
-	(x, y) describes the top left point of the seven segment display
+	(x, y) describes the top right point of the seven segment display
 	*/
 	drawHorizontalSegment(x, y+DELTA_Y);
 }
 void drawSeg2(uint16_t x, uint16_t y){
 	/*
 	args:
-	(x, y) describes the top left point of the seven segment display
+	(x, y) describes the top right point of the seven segment display
 	*/
-	drawVerticalSegment(x+DELTA_X, y);
+	drawVerticalSegment(x, y);
 }
 void drawSeg3(uint16_t x, uint16_t y){
 	/*
 	args:
-	(x, y) describes the top left point of the seven segment display
+	(x, y) describes the top right point of the seven segment display
 	*/
-	drawVerticalSegment(x+DELTA_X, y+DELTA_Y);
+	drawVerticalSegment(x, y+DELTA_Y);
 }
 void drawSeg5(uint16_t x, uint16_t y){
 	/*
 	args:
-	(x, y) describes the top left point of the seven segment display
+	(x, y) describes the top right point of the seven segment display
 	*/
-	drawVerticalSegment(x, y+DELTA_Y);
+	drawVerticalSegment(x-DELTA_X, y+DELTA_Y);
 }
 void drawSeg6(uint16_t x, uint16_t y){
 	/*
 	args:
-	(x, y) describes the top left point of the seven segment display
+	(x, y) describes the top right point of the seven segment display
 	*/
-	drawVerticalSegment(x, y);
+	drawVerticalSegment(x-DELTA_X, y);
 }
 
 void draw0(uint16_t x, uint16_t y){
 	/*
 	args:
-	(x, y) describes the top left point of the seven segment display
+	(x, y) describes the top right point of the seven segment display
 	*/
 	drawSeg1(x, y);
 	drawSeg2(x, y);
@@ -88,7 +88,7 @@ void draw0(uint16_t x, uint16_t y){
 void draw1(uint16_t x, uint16_t y){
 	/*
 	args:
-	(x, y) describes the top left point of the seven segment display
+	(x, y) describes the top right point of the seven segment display
 	*/
 	drawSeg2(x, y);
 	drawSeg3(x, y);
@@ -97,7 +97,7 @@ void draw1(uint16_t x, uint16_t y){
 void draw2(uint16_t x, uint16_t y){
 	/*
 	args:
-	(x, y) describes the top left point of the seven segment display
+	(x, y) describes the top right point of the seven segment display
 	*/
 	drawSeg1(x, y);
 	drawSeg2(x, y);
@@ -108,7 +108,7 @@ void draw2(uint16_t x, uint16_t y){
 void draw3(uint16_t x, uint16_t y){
 	/*
 	args:
-	(x, y) describes the top left point of the seven segment display
+	(x, y) describes the top right point of the seven segment display
 	*/
 	drawSeg1(x, y);
 	drawSeg2(x, y);
@@ -119,7 +119,7 @@ void draw3(uint16_t x, uint16_t y){
 void draw4(uint16_t x, uint16_t y){
 	/*
 	args:
-	(x, y) describes the top left point of the seven segment display
+	(x, y) describes the top right point of the seven segment display
 	*/
 	drawSeg2(x, y);
 	drawSeg3(x, y);
@@ -129,7 +129,7 @@ void draw4(uint16_t x, uint16_t y){
 void draw5(uint16_t x, uint16_t y){
 	/*
 	args:
-	(x, y) describes the top left point of the seven segment display
+	(x, y) describes the top right point of the seven segment display
 	*/
 	drawSeg1(x, y);
 	drawSeg4(x, y);
@@ -140,7 +140,7 @@ void draw5(uint16_t x, uint16_t y){
 void draw6(uint16_t x, uint16_t y){
 	/*
 	args:
-	(x, y) describes the top left point of the seven segment display
+	(x, y) describes the top right point of the seven segment display
 	*/
 	drawSeg1(x, y);
 	drawSeg3(x, y);
@@ -152,7 +152,7 @@ void draw6(uint16_t x, uint16_t y){
 void draw7(uint16_t x, uint16_t y){
 	/*
 	args:
-	(x, y) describes the top left point of the seven segment display
+	(x, y) describes the top right point of the seven segment display
 	*/
 	drawSeg1(x, y);
 	drawSeg2(x, y);
@@ -161,7 +161,7 @@ void draw7(uint16_t x, uint16_t y){
 void draw8(uint16_t x, uint16_t y){
 	/*
 	args:
-	(x, y) describes the top left point of the seven segment display
+	(x, y) describes the top right point of the seven segment display
 	*/
 	drawSeg1(x, y);
 	drawSeg2(x, y);
@@ -174,7 +174,7 @@ void draw8(uint16_t x, uint16_t y){
 void draw9(uint16_t x, uint16_t y){
 	/*
 	args:
-	(x, y) describes the top left point of the seven segment display
+	(x, y) describes the top right point of the seven segment display
 	*/
 	drawSeg1(x, y);
 	drawSeg2(x, y);
@@ -187,7 +187,7 @@ void draw9(uint16_t x, uint16_t y){
 void drawColon(uint16_t x, uint16_t y) {
 	/*
 	args:
-	(x, y) describes the top left point of the colon
+	(x, y) describes the top right point of the colon
 	*/
 	ST7735_FillRect(x, y, 3, 3, ST7735_WHITE);
 	ST7735_FillRect(x, y+DELTA_Y, 3, 3, ST7735_WHITE);

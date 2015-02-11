@@ -4,11 +4,6 @@
 #define PF0       (*((volatile uint32_t *)0x40025004))
 #define PF1       (*((volatile uint32_t *)0x40025008))
 
-void DisableInterrupts(void); // Disable interrupts
-void EnableInterrupts(void);  // Enable interrupts
-long StartCritical (void);    // previous I bit, disable interrupts
-void EndCritical(long sr);    // restore I bit to previous value
-void WaitForInterrupt(void);  // low power mode
 void SetTime_Init(){
 	volatile uint32_t delay;
 	
@@ -31,7 +26,6 @@ void SetTime_Init(){
   GPIO_PORTF_IM_R |= 0x03;      // (f) arm interrupt on PF0, 1 *** No IME bit as mentioned in Book ***
   NVIC_PRI7_R = (NVIC_PRI7_R&0xFF00FFFF)|0x00A00000; // (g) priority 5
   NVIC_EN0_R = 0x40000000;      // (h) enable interrupt 30 in NVIC
-  EnableInterrupts();           // (i) Clears the I bit
 }
 void GPIOPortF_Handler(void){
 	GPIO_PORTF_ICR_R = 0x03;      // acknowledge flag 0, 1
