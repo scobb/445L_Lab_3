@@ -43,7 +43,7 @@ void analogTime() {
 	}
 	if (my_minutes != time_minutes){
 		if (time_minutes % 5 == 0){
-			drawClock(0, time_hours);
+			drawClock(0, time_minutes/5);
 		}
 		//Draws a black line over the previous value and a green line on the next minute
 		ST7735_Line(CENTER_X, CENTER_Y, xVals[time_minutes-1], yVals[time_minutes-1], ST7735_Color565(0, 0, 0));
