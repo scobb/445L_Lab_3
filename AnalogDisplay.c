@@ -34,7 +34,6 @@ void drawClock(uint8_t drawDashes, uint8_t numToDraw) {
 
 void analogTime() {
 	static uint16_t my_minutes = -1;
-	static uint16_t my_hours = -1;
 	static uint16_t my_hourIncrementer = 0;
 	
 	//Before we do anything, let's check to see if the hour/minute hands are currently overlapping
@@ -51,18 +50,14 @@ void analogTime() {
 		my_minutes = time_minutes;
 	}
 	
-	if (my_hours != time_hours){
-		if (time_minutes % 12 == 0){
-			my_hourIncrementer = my_hourIncrementer + 1;
-			ST7735_Line(CENTER_X, CENTER_Y, xValsH[my_hourIncrementer-1], yValsH[my_hourIncrementer-1], ST7735_Color565(0, 0, 0));
-		}
-		
-		ST7735_Line(CENTER_X, CENTER_Y, xValsH[my_hourIncrementer], yValsH[my_hourIncrementer], ST7735_Color565(0, 0, 255));
-		if (my_hourIncrementer >= MINUTES_PER_HOUR){
-			my_hourIncrementer = 0;
-		}
-		
-		my_hours = time_hours;
+	//Now dealing with hours
+	if (time_minutes % 12 == 0){
+		my_hourIncrementer = my_hourIncrementer + 1;
+		ST7735_Line(CENTER_X, CENTER_Y, xValsH[my_hourIncrementer-1], yValsH[my_hourIncrementer-1], ST7735_Color565(0, 0, 0));
+	}
+	ST7735_Line(CENTER_X, CENTER_Y, xValsH[my_hourIncrementer], yValsH[my_hourIncrementer], ST7735_Color565(0, 0, 255));
+	if (my_hourIncrementer >= MINUTES_PER_HOUR){
+		my_hourIncrementer = 0;
 	}
 }
 
