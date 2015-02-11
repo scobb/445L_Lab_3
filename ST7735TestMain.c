@@ -36,7 +36,10 @@
 #include "ST7735.h"
 #include "PLL.h"
 #include "ST7735_Line.h"
+#include "ST7735_SevenSeg.h"
 #include "inc/tm4c123gh6pm.h"
+#include "SetTime.h"
+#include "Clock.h"
 
 void DelayWait10ms(uint32_t n);
 
@@ -480,16 +483,13 @@ const uint16_t Logo[] = {
 int main(void){
   PLL_Init();
   Output_Init();
-	
-  ST7735_Line(20, 85, 20, 15, ST7735_YELLOW);
-  ST7735_Line(20, 15, 0, 15, ST7735_YELLOW);
-	ST7735_Line(0, 0, 126, 159, ST7735_BLUE);
-	ST7735_Line(126, 0, 0, 159, ST7735_RED);
-	ST7735_Line(5, 154, 121, 5, ST7735_GREEN);
-	ST7735_Line(121, 154, 5, 5, ST7735_WHITE);
-	ST7735_Line(0, 0, 50, 50, ST7735_RED);
-	//ST7735_Line(75, 76, 75, 75, ST7735_WHITE);
-  //printf("hello world");
+	SetTime_Init();
+	Clock_Init();
+	/*draw1(13, 50);
+	draw2(45, 50);
+	draw3(85, 50);
+	draw4(113, 50);
+	drawColon(50, 64);*/
   while(1){
   }
 } 
