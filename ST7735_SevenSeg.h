@@ -21,6 +21,7 @@ void draw6(uint16_t x, uint16_t y);
 void draw7(uint16_t x, uint16_t y);
 void draw8(uint16_t x, uint16_t y);
 void draw9(uint16_t x, uint16_t y);
+void drawBlank(uint16_t x, uint16_t y);
 void drawColon(uint16_t x, uint16_t y);
 
 

@@ -20,6 +20,16 @@ void increment_time(){
 		}
 	}
 }
+void debug_increment_time(){
+	++time_minutes;
+	if (time_minutes >= MINUTES_PER_HOUR){
+		time_minutes = 0;
+		++time_hours;
+		if (time_minutes >= HOURS_DISPLAYED){
+			time_hours=0;
+		}
+	}
+}
 void Clock_setDisplayFunction(void(*task)(void)){
 	setHandler(task);
 }
@@ -31,7 +41,7 @@ void Clock_Init(){
 	time_hours = 0;
 	
 	// set up timer 0A
-  Timer0A_Init(&increment_time, CYCLES_PER_SECOND);
-	
+  // Timer0A_Init(&increment_time, CYCLES_PER_SECOND);
+	Timer0A_Init(&debug_increment_time, CYCLES_PER_SECOND);
 	
 }

@@ -16,15 +16,15 @@ typedef struct{
 
 displayCell hourDisplayMap[] = {
 	{&draw1, &draw2},
-	{&draw0, &draw1},
-	{&draw0, &draw2},
-	{&draw0, &draw3},
-	{&draw0, &draw4},
-	{&draw0, &draw5},
-	{&draw0, &draw6},
-	{&draw0, &draw7},
-	{&draw0, &draw8},
-	{&draw0, &draw9},
+	{&drawBlank, &draw1},
+	{&drawBlank, &draw2},
+	{&drawBlank, &draw3},
+	{&drawBlank, &draw4},
+	{&drawBlank, &draw5},
+	{&drawBlank, &draw6},
+	{&drawBlank, &draw7},
+	{&drawBlank, &draw8},
+	{&drawBlank, &draw9},
 	{&draw1, &draw0},
 	{&draw1, &draw1},
 };
@@ -45,19 +45,33 @@ displayCell minuteDisplayMap[] = {
 
 void enableDigitalDisplay(){
 	Clock_setDisplayFunction(&displayDigital);
+	drawColon(50, 64);
+	(*minuteDisplayMap[time_minutes].left)(MINUTE_LEFT_X, ALL_Y);
+	(*minuteDisplayMap[time_minutes].right)(MINUTE_RIGHT_X, ALL_Y);
+	(*hourDisplayMap[time_hours].left)(HOUR_LEFT_X, ALL_Y);
+	(*hourDisplayMap[time_hours].right)(HOUR_RIGHT_X, ALL_Y);
 }
 void displayDigital(){
 	// draw spot 1
 	static uint16_t my_minutes = -1;
-	if (time_minutes == my_minutes)
-		return;
-	my_minutes = time_minutes;
-  ST7735_FillScreen(0);                 // set screen to black
-	(*hourDisplayMap[time_hours].left)(HOUR_LEFT_X, ALL_Y);
-	(*hourDisplayMap[time_hours].right)(HOUR_RIGHT_X, ALL_Y);
-	(*minuteDisplayMap[time_minutes].left)(MINUTE_LEFT_X, ALL_Y);
-	(*minuteDisplayMap[time_minutes].right)(MINUTE_RIGHT_X, ALL_Y);
-	drawColon(50, 64);
+	static uint16_t my_hours = -1;
+		
+	if (my_minutes != time_minutes){
+		if (time_minutes % 10 == 0){
+			(*minuteDisplayMap[time_minutes].left)(MINUTE_LEFT_X, ALL_Y);
+		}
+		(*minuteDisplayMap[time_minutes].right)(MINUTE_RIGHT_X, ALL_Y);
+		my_minutes = time_minutes;
+	}
+	if (my_hours != time_hours){
+		if (time_hours == 1 || time_hours == 10){
+			if (hourDisplayMap[time_hours].left)
+				(*hourDisplayMap[time_hours].left)(HOUR_LEFT_X, ALL_Y);
+		}
+		(*hourDisplayMap[time_hours].right)(HOUR_RIGHT_X, ALL_Y);
+		my_hours = time_hours;
+		
+	}
 	/*draw1(13, 50);
 	draw2(45, 50);
 	draw3(85, 50)

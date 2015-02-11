@@ -3,6 +3,7 @@
 // 128 x 160
 #define DELTA_X 24
 #define DELTA_Y 30
+#define BUFFER 4
 void drawHorizontalSegment(uint16_t x, uint16_t y){
 	/*
 	args:
@@ -77,6 +78,7 @@ void draw0(uint16_t x, uint16_t y){
 	args:
 	(x, y) describes the top right point of the seven segment display
 	*/
+	ST7735_FillRect(x - DELTA_X, y, DELTA_X+BUFFER, 2*DELTA_Y+BUFFER, 0);
 	drawSeg1(x, y);
 	drawSeg2(x, y);
 	drawSeg3(x, y);
@@ -90,6 +92,7 @@ void draw1(uint16_t x, uint16_t y){
 	args:
 	(x, y) describes the top right point of the seven segment display
 	*/
+	ST7735_FillRect(x - DELTA_X, y, DELTA_X+BUFFER, 2*DELTA_Y+BUFFER, 0);
 	drawSeg2(x, y);
 	drawSeg3(x, y);
 }
@@ -99,6 +102,7 @@ void draw2(uint16_t x, uint16_t y){
 	args:
 	(x, y) describes the top right point of the seven segment display
 	*/
+	ST7735_FillRect(x - DELTA_X, y, DELTA_X+BUFFER, 2*DELTA_Y+BUFFER, 0);
 	drawSeg1(x, y);
 	drawSeg2(x, y);
 	drawSeg7(x, y);
@@ -110,6 +114,7 @@ void draw3(uint16_t x, uint16_t y){
 	args:
 	(x, y) describes the top right point of the seven segment display
 	*/
+	ST7735_FillRect(x - DELTA_X, y, DELTA_X+BUFFER, 2*DELTA_Y+BUFFER, 0);
 	drawSeg1(x, y);
 	drawSeg2(x, y);
 	drawSeg3(x, y);
@@ -121,6 +126,7 @@ void draw4(uint16_t x, uint16_t y){
 	args:
 	(x, y) describes the top right point of the seven segment display
 	*/
+	ST7735_FillRect(x - DELTA_X, y, DELTA_X+BUFFER, 2*DELTA_Y+BUFFER, 0);
 	drawSeg2(x, y);
 	drawSeg3(x, y);
 	drawSeg6(x, y);
@@ -131,6 +137,7 @@ void draw5(uint16_t x, uint16_t y){
 	args:
 	(x, y) describes the top right point of the seven segment display
 	*/
+	ST7735_FillRect(x - DELTA_X, y, DELTA_X+BUFFER, 2*DELTA_Y+BUFFER, 0);
 	drawSeg1(x, y);
 	drawSeg4(x, y);
 	drawSeg3(x, y);
@@ -142,6 +149,7 @@ void draw6(uint16_t x, uint16_t y){
 	args:
 	(x, y) describes the top right point of the seven segment display
 	*/
+	ST7735_FillRect(x - DELTA_X, y, DELTA_X+BUFFER, 2*DELTA_Y+BUFFER, 0);
 	drawSeg1(x, y);
 	drawSeg3(x, y);
 	drawSeg4(x, y);
@@ -154,6 +162,7 @@ void draw7(uint16_t x, uint16_t y){
 	args:
 	(x, y) describes the top right point of the seven segment display
 	*/
+	ST7735_FillRect(x - DELTA_X, y, DELTA_X+BUFFER, 2*DELTA_Y+BUFFER, 0);
 	drawSeg1(x, y);
 	drawSeg2(x, y);
 	drawSeg3(x, y);
@@ -163,6 +172,7 @@ void draw8(uint16_t x, uint16_t y){
 	args:
 	(x, y) describes the top right point of the seven segment display
 	*/
+	ST7735_FillRect(x - DELTA_X, y, DELTA_X+BUFFER, 2*DELTA_Y+BUFFER, 0);
 	drawSeg1(x, y);
 	drawSeg2(x, y);
 	drawSeg3(x, y);
@@ -176,12 +186,21 @@ void draw9(uint16_t x, uint16_t y){
 	args:
 	(x, y) describes the top right point of the seven segment display
 	*/
+	ST7735_FillRect(x - DELTA_X, y, DELTA_X+BUFFER, 2*DELTA_Y+BUFFER, 0);
 	drawSeg1(x, y);
 	drawSeg2(x, y);
 	drawSeg3(x, y);
 	drawSeg4(x, y);
 	drawSeg6(x, y);
 	drawSeg7(x, y);
+}
+
+void drawBlank(uint16_t x, uint16_t y){
+	/*
+	args:
+	(x, y) describes the top right point of the seven segment display
+	*/
+	ST7735_FillRect(x - DELTA_X, y, DELTA_X+BUFFER, 2*DELTA_Y+BUFFER, 0);
 }
 
 void drawColon(uint16_t x, uint16_t y) {
