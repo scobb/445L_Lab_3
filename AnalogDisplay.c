@@ -12,6 +12,7 @@
 //drawDashes - 1 means draw them, 0 means don't
 //numToDraw - 0 means draw all numbers, 1-12 means draw that number
 void drawClock(uint8_t drawDashes, uint8_t numToDraw) {
+	ST7735_SetCursor(0, 0);
 	//This will draw all of the clock dashes
 	if (drawDashes == 1){
 		for (int i = 0; i < 24; i+=2){
