@@ -183,3 +183,13 @@ void draw9(uint16_t x, uint16_t y){
 	drawSeg6(x, y);
 	drawSeg7(x, y);
 }
+
+void drawColon(uint16_t x, uint16_t y) {
+	/*
+	args:
+	(x, y) describes the top left point of the colon
+	*/
+	ST7735_FillRect(x, y, 3, 3, ST7735_WHITE);
+	ST7735_FillRect(x, y+DELTA_Y, 3, 3, ST7735_WHITE);
+}
+	
