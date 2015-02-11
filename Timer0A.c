@@ -50,6 +50,7 @@ void EndCritical(long sr);    // restore I bit to previous value
 void WaitForInterrupt(void);  // low power mode
 void (*PeriodicTask)(void);   // user function
 void (*DisplayTask)(void);   // user function
+void (*CheckTask)(void);   // user 
 
 // ***************** Timer0A_Init ****************
 // Activate Timer0A interrupts to run user task periodically
@@ -75,11 +76,16 @@ void Timer0A_Init(void(*task)(void), uint32_t period){long sr;
 void setHandler(void(*task)(void)){
 	DisplayTask = task;
 }
+void setAlarmCheck(void(*task)(void)){
+	CheckTask = task;
+}
 
 void Timer0A_Handler(void){
   TIMER0_ICR_R = TIMER_ICR_TATOCINT;// acknowledge timer0A timeout
-  (*PeriodicTask)();                // execute user task
-	if (DisplayTask) {
-		(*DisplayTask)();
+  (*PeriodicTask)();                // increment time
+	if (CheckTask) 										// if alarm is armed
+		(*CheckTask)();									// check if time to sound the alarm
+	if (DisplayTask) {								// if we have a display task
+		(*DisplayTask)();								// display the time
 	}
 }
