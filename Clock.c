@@ -14,7 +14,7 @@ void increment_time(){
 		if (time_minutes >= MINUTES_PER_HOUR){
 			time_minutes = 0;
 			++time_hours;
-			if (time_minutes >= HOURS_DISPLAYED){
+			if (time_hours >= HOURS_DISPLAYED){
 				time_hours=0;
 			}
 		}
@@ -25,7 +25,7 @@ void debug_increment_time(){
 	if (time_minutes >= MINUTES_PER_HOUR){
 		time_minutes = 0;
 		++time_hours;
-		if (time_minutes >= HOURS_DISPLAYED){
+		if (time_hours >= HOURS_DISPLAYED){
 			time_hours=0;
 		}
 	}
