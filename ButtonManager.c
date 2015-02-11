@@ -2,6 +2,11 @@
 #include "inc/tm4c123gh6pm.h"
 #include "ST7735.h"
 #include "SysTick.h"
+#include "Alarm.h"
+#include "Clock.h"
+#include "DigitalDisplay.h"
+#include "AnalogDisplay.h"
+
 #define PF0       (*((volatile uint32_t *)0x40025004))
 #define PF1       (*((volatile uint32_t *)0x40025008))
 #define PF2       (*((volatile uint32_t *)0x40025010))
@@ -9,6 +14,14 @@
 #define PF4       (*((volatile uint32_t *)0x40025040))
 #define TRUE 1
 #define FALSE 0
+#define NONE 0
+#define ALARM 1
+#define TIME 2
+#define NUM_SET_MODES 3
+
+void(*incrementHours)(void) = 0;
+void(*incrementMinutes)(void) = 0;
+uint8_t set_mode = NONE;
 typedef struct {
   uint32_t readValue;
 	uint8_t isLow;
@@ -40,13 +53,44 @@ void ButtonManager_Init(){
   NVIC_EN0_R = 0x40000000;      // (h) enable interrupt 30 in NVIC
 }
 void handlePF0(){
-	printf("0\n");
+	// PF0 will be our arm/disarm button. Toggles the status of our alarm.
+	if (alarm_armed){
+		disarmAlarm();
+	} else {
+		armAlarm();
+	}
 }
 void handlePF1(){
-	printf("1\n");
+	if (display_mode == DIGITAL){
+		ST7735_FillScreen(0);    
+		// ST7735_SetCursor(0,0);
+		enableAnalogDisplay();
+	} else {
+		ST7735_FillScreen(0);    
+		enableDigitalDisplay();
+	}
+}
+void incrementAlarmHours(){
+	++alarm_hours;
+}
+void incrementAlarmMinutes(){
+	++alarm_minutes;
+}
+void incrementTimeHours(){
+	++time_hours;
+}
+void incrementTimeMinutes(){
+	++time_minutes;
 }
 void handlePF2(){
-	printf("2\n");
+	set_mode = (set_mode + 1 ) % NUM_SET_MODES;
+	if (set_mode == NONE){
+		incrementHours = 0;
+		incrementMinutes = 0;
+	} else if (set_mode == ALARM){
+		incrementHours = &incrementAlarmHours;
+		incrementMinutes = &incrementAlarmMinutes;
+	}
 }
 void handlePF3(){
 	printf("3\n");

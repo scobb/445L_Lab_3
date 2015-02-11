@@ -62,6 +62,7 @@ void analogTime() {
 }
 
 void enableAnalogDisplay() {
+	display_mode = ANALOG;
 	drawClock(1, 0);
 	Clock_setDisplayFunction(&analogTime);
 }

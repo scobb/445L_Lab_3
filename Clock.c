@@ -6,6 +6,7 @@
 #define MINUTES_PER_HOUR 60
 #define HOURS_DISPLAYED 12
 volatile uint16_t time_seconds, time_minutes, time_hours;
+volatile uint8_t display_mode;
 void increment_time(){
 	++time_seconds;
 	if (time_seconds >= SECONDS_PER_MINUTE){

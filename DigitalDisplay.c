@@ -44,6 +44,7 @@ displayCell minuteDisplayMap[] = {
 };
 
 void enableDigitalDisplay(){
+	display_mode = DIGITAL;
 	Clock_setDisplayFunction(&displayDigital);
 	drawColon(50, 64);
 	(*minuteDisplayMap[time_minutes].left)(MINUTE_LEFT_X, ALL_Y);
