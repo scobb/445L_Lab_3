@@ -16,3 +16,21 @@ void drawClock() {
 		printf("Test");
 	}
 }
+
+void analogTime() {
+	static uint16_t my_minutes = -1;
+	static uint16_t my_hours = -1;
+	
+	if (my_minutes != time_minutes){
+		
+	}
+	
+	if (my_hours != time_hours){
+		
+	}
+}
+
+void enableAnalogClock() {
+	drawClock();
+	Clock_setDisplayFunction(&analogTime);
+}
