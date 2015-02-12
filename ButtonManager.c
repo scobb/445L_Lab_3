@@ -6,6 +6,7 @@
 #include "Clock.h"
 #include "DigitalDisplay.h"
 #include "AnalogDisplay.h"
+#include "ST7735_Constants.h"
 
 #define PF0       (*((volatile uint32_t *)0x40025004))
 #define PF1       (*((volatile uint32_t *)0x40025008))
@@ -18,6 +19,10 @@
 #define ALARM 1
 #define TIME 2
 #define NUM_SET_MODES 3
+#define SPEAKER_X 96
+#define SPEAKER_Y 140
+#define SPEAKER_WIDTH 16
+#define SPEAKER_HEIGHT 15
 #define LABEL_X 16
 #define LABEL_Y 126
 #define LABEL_WIDTH 80
@@ -59,19 +64,21 @@ void ButtonManager_Init(){
 void armDisarmPressed(){
 	// Toggles the status of our alarm.
 	if (alarm_armed){
+		ST7735_FillRect(SPEAKER_X, SPEAKER_Y-SPEAKER_HEIGHT, SPEAKER_WIDTH+1, SPEAKER_HEIGHT+1, 0);
 		disarmAlarm();
 	} else {
+		ST7735_DrawBitmap(SPEAKER_X, SPEAKER_Y, speaker, SPEAKER_WIDTH, SPEAKER_HEIGHT);
 		armAlarm();
 	}
 }
 void displayModePressed(){
 	// handler for button press to swap between digital and analog
 	if (display_mode == DIGITAL){
-		ST7735_FillScreen(0);    
+		ST7735_FillRect(0, 0, 128, 128, 0); 
 		// ST7735_SetCursor(0,0);
 		enableAnalogDisplay();
 	} else {
-		ST7735_FillScreen(0);    
+		ST7735_FillRect(0, 0, 128, 128, 0);  
 		enableDigitalDisplay();
 	}
 }
