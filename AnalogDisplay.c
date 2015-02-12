@@ -15,6 +15,7 @@ void drawClock(uint8_t drawDashes, uint8_t numToDraw) {
 	ST7735_SetCursor(0, 0);
 	//This will draw all of the clock dashes
 	if (drawDashes == 1){
+		ST7735_FillRect(0, 0, 128, 128, 0);
 		for (int i = 0; i < 24; i+=2){
 			ST7735_Line(analogDashX[i], analogDashY[i], analogDashX[i+1], analogDashY[i+1], ST7735_Color565(255, 255, 255));
 		}
