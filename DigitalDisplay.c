@@ -2,6 +2,7 @@
 #include "Clock.h"
 #include "ST7735_SevenSeg.h"
 #include "ST7735.h"
+#include "Alarm.h"
 
 // define the pixels we'll use to display
 #define HOUR_LEFT_X 13
@@ -43,14 +44,51 @@ displayCell minuteDisplayMap[] = {
 	{&draw5, &draw5}, {&draw5, &draw6}, {&draw5, &draw7}, {&draw5, &draw8}, {&draw5, &draw9},
 };
 
-void enableDigitalDisplay(){
-	display_mode = DIGITAL;
-	Clock_setDisplayFunction(&displayDigital);
-	drawColon(50, 64);
+void displayCurrentTimeDigital(){
+	// draws the full time regardless of previous time-- for use initializations
 	(*minuteDisplayMap[time_minutes].left)(MINUTE_LEFT_X, ALL_Y);
 	(*minuteDisplayMap[time_minutes].right)(MINUTE_RIGHT_X, ALL_Y);
 	(*hourDisplayMap[time_hours].left)(HOUR_LEFT_X, ALL_Y);
 	(*hourDisplayMap[time_hours].right)(HOUR_RIGHT_X, ALL_Y);
+	drawColon(50, 64);
+}
+void displayCurrentAlarmTimeDigital(){
+	// draws the full time regardless of previous time-- for use initializations
+	(*minuteDisplayMap[alarm_minutes].left)(MINUTE_LEFT_X, ALL_Y);
+	(*minuteDisplayMap[alarm_minutes].right)(MINUTE_RIGHT_X, ALL_Y);
+	(*hourDisplayMap[alarm_hours].left)(HOUR_LEFT_X, ALL_Y);
+	(*hourDisplayMap[alarm_hours].right)(HOUR_RIGHT_X, ALL_Y);
+	drawColon(50, 64);
+}
+void enableDigitalDisplay(){
+	display_mode = DIGITAL;
+	Clock_setDisplayFunction(&displayDigital);
+	displayCurrentTimeDigital();
+}
+
+
+void displayAlarmDigital(){
+	// draw spot 1
+	static uint16_t my_minutes = -1;
+	static uint16_t my_hours = -1;
+		
+	if (my_minutes != alarm_minutes){
+		if (alarm_minutes % 10 == 0){
+			(*minuteDisplayMap[alarm_minutes].left)(MINUTE_LEFT_X, ALL_Y);
+		}
+		(*minuteDisplayMap[alarm_minutes].right)(MINUTE_RIGHT_X, ALL_Y);
+		my_minutes = alarm_minutes;
+	}
+	if (my_hours != alarm_hours){
+		if (alarm_hours == 1 || alarm_hours == 10){
+			if (hourDisplayMap[alarm_hours].left)
+				(*hourDisplayMap[alarm_hours].left)(HOUR_LEFT_X, ALL_Y);
+		}
+		(*hourDisplayMap[alarm_hours].right)(HOUR_RIGHT_X, ALL_Y);
+		my_hours = alarm_hours;
+		
+	}
+	
 }
 void displayDigital(){
 	// draw spot 1

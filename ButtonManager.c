@@ -52,7 +52,7 @@ void ButtonManager_Init(){
   NVIC_PRI7_R = (NVIC_PRI7_R&0xFF00FFFF)|0x00A00000; // (g) priority 5
   NVIC_EN0_R = 0x40000000;      // (h) enable interrupt 30 in NVIC
 }
-void handlePF0(){
+void armDisarmPressed(){
 	// PF0 will be our arm/disarm button. Toggles the status of our alarm.
 	if (alarm_armed){
 		disarmAlarm();
@@ -60,7 +60,7 @@ void handlePF0(){
 		armAlarm();
 	}
 }
-void handlePF1(){
+void displayModePressed(){
 	if (display_mode == DIGITAL){
 		ST7735_FillScreen(0);    
 		// ST7735_SetCursor(0,0);
@@ -72,33 +72,63 @@ void handlePF1(){
 }
 void incrementAlarmHours(){
 	++alarm_hours;
+	displayAlarmDigital();
 }
 void incrementAlarmMinutes(){
 	++alarm_minutes;
+	displayAlarmDigital();
 }
 void incrementTimeHours(){
 	++time_hours;
+	displayDigital();
 }
 void incrementTimeMinutes(){
 	++time_minutes;
+	displayDigital();
 }
-void handlePF2(){
+void setModePressed(){
 	set_mode = (set_mode + 1 ) % NUM_SET_MODES;
 	if (set_mode == NONE){
 		incrementHours = 0;
 		incrementMinutes = 0;
 	} else if (set_mode == ALARM){
+		// disable real time scree updates
+		Clock_setDisplayFunction(0);
+		
+		// clear screen
+		ST7735_FillScreen(0);    
+		
+		// display alarm time
+		// if (display_mode == DIGITAL)
+		displayCurrentAlarmTimeDigital();
+		//else displayAlarmAnalog();
+		
 		incrementHours = &incrementAlarmHours;
 		incrementMinutes = &incrementAlarmMinutes;
+	} else {
+		if (display_mode == DIGITAL) {
+			displayCurrentTimeDigital();
+			Clock_setDisplayFunction(&displayDigital);
+		} else {
+			Clock_setDisplayFunction(&analogTime);
+		}
+		incrementHours = &incrementTimeHours;
+		incrementMinutes = &incrementTimeMinutes;
 	}
 }
-void handlePF3(){
-	printf("3\n");
+
+void hoursPressed(){
+	// HOURS button
+	if (incrementHours)
+		(*incrementHours)();
 }
-void handlePF4(){
-	printf("4\n");
+void minutesPressed(){
+	// HOURS button
+	if (incrementMinutes)
+		(*incrementMinutes)();
 }
 void CheckDebounce(buttonStatus* buttons, uint8_t numPorts){
+	// private function to allow us to debounce all buttons
 	uint8_t i;
 	SysTick_Wait10ms(40);
 	for (i=0; i < numPorts; ++i){
@@ -108,15 +138,15 @@ void CheckDebounce(buttonStatus* buttons, uint8_t numPorts){
 	}
 }
 void GPIOPortF_Handler(void){
+	// handler for port F -- all 5 buttons
 	uint8_t i;
-	GPIO_PORTF_ICR_R = 0x1F;      // acknowledge flag 0, 1
-	// TODO - add a blind cycle wait to get rid of bounce
+	GPIO_PORTF_ICR_R = 0x1F;      // acknowledge flag 0-4
 	buttonStatus ports[5] = {
-		{PF0, FALSE, &handlePF0},
-		{PF1, FALSE ,&handlePF1}, 
-		{PF2, FALSE, &handlePF2},
-		{PF3, FALSE, &handlePF3},
-		{PF4, FALSE, &handlePF4}
+		{PF0, FALSE, &armDisarmPressed},
+		{PF1, FALSE ,&displayModePressed}, 
+		{PF2, FALSE, &setModePressed},
+		{PF3, FALSE, &hoursPressed},
+		{PF4, FALSE, &minutesPressed}
 	};
 	for (i=0; i < 5; i++){
 		if (ports[i].readValue == 0){
