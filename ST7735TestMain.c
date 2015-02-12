@@ -43,6 +43,7 @@
 #include "DigitalDisplay.h"
 #include "Alarm.h"
 #include "SysTick.h"
+#include "Heartbeat.h"
 
 void DelayWait10ms(uint32_t n);
 
@@ -57,10 +58,11 @@ int main(void){
   PLL_Init();										// initializes phase lock loop, set clcok to 80MHz
 	SysTick_Init();
   Output_Init();								// initializes ST7735 display
-	ButtonManager_Init();								// initializes edge-triggered interrupts for PF0, PF1, active LOW
 	Clock_Init();									// starts clock--will print to the screen for now
 	enableDigitalDisplay();
 	Alarm_Init();
+	Heartbeat_Init();
+	ButtonManager_Init();				// initializes edge-triggered interrupts for PF0, PF1, active LOW
   EnableInterrupts();           // (i) Clears the I bit
 	/*draw1(13, 50);
 	draw2(45, 50);

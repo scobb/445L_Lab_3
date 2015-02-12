@@ -42,53 +42,30 @@ typedef struct {
 	void(*handler)(void);
 } buttonStatus;
 
-void ButtonManager_Init_D(){
+void ButtonManager_Init(){
 	volatile uint32_t delay;
+	PF2 = 0x04;
 	
   SYSCTL_RCGCGPIO_R |= 0x00000008;  // 1) activate clock for Port D
   delay = SYSCTL_RCGCGPIO_R;        // allow time for clock to start
-  GPIO_PORTD_LOCK_R = 0x4C4F434B;   // 2) unlock GPIO Port F
-  GPIO_PORTD_CR_R |= 0x4F;           // allow changes to PF4-0
-  // only PF0 needs to be unlocked, other bits can't be locked
-  GPIO_PORTD_AMSEL_R &= ~0x4F;        // 3) disable analog on PF
-  GPIO_PORTD_DIR_R &= ~0x4F;          // 5) PF4,PF0 out, PF1 out
+  // GPIO_PORTD_LOCK_R = GPIO_LOCK_KEY;   // Not using PD7 so don't need to unlock
+  // GPIO_PORTD_CR_R |= 0x4F;           // Don't need to unlock PD7
   GPIO_PORTD_AFSEL_R &= ~0x4F;        // 6) disable alt funct on PF1-0
-  GPIO_PORTD_PUR_R |= 0x4F;          // enable pull-up on PF0 and PF1
-  GPIO_PORTD_DEN_R |= 0x4F;          // 7) enable digital I/O on PF1-0
-  GPIO_PORTD_PCTL_R &= ~0x0F00FFFF; // configure PF0, 1 as GPIO
+  GPIO_PORTD_DIR_R &= ~0x4F;          // 5) PD0-3, 6 are in
+  GPIO_PORTD_AMSEL_R &= ~0x4F;        // 3) disable analog on PD
+  GPIO_PORTD_PUR_R |= 0x4F;          // enable pull-up on PD
+  GPIO_PORTD_DEN_R |= 0x4F;          // 7) enable digital I/O on PD
+  GPIO_PORTD_PCTL_R &= ~0x0F00FFFF; // configure PD0-3, 6 as GPIO
 	
   GPIO_PORTD_IS_R &= ~0x4F;     // (d) PF0, 1 is edge-sensitive
   GPIO_PORTD_IBE_R &= ~0x4F;    //     PF0, 1 is not both edges
   GPIO_PORTD_IEV_R &= ~0x4F;    //     PF0, 1 falling edge event
   GPIO_PORTD_ICR_R = 0x4F;      // (e) clear flag4
-  GPIO_PORTD_IM_R |= 0x4F;      // (f) arm interrupt on PF0, 1 *** No IME bit as mentioned in Book ***
-  NVIC_PRI0_R = (NVIC_PRI0_R&0x00FFFFFFF)|0x0A000000; // (g) priority 5
-  NVIC_EN0_R = 0x00080000;      // (h) enable interrupt 28 in NVIC
+  GPIO_PORTD_IM_R |= 0x4F;      // (f) arm interrupt on PD0-3, 6 *** No IME bit as mentioned in Book ***
+  NVIC_PRI0_R = (NVIC_PRI0_R&0x0FFFFFFF)|0x40000000; // (g) priority 2
+  NVIC_EN0_R |= NVIC_EN0_INT3;      // (h) enable interrupt 19 in NVIC
 	
 	
-}
-void ButtonManager_Init(){
-	volatile uint32_t delay;
-	
-  SYSCTL_RCGCGPIO_R |= 0x00000020;  // 1) activate clock for Port F
-  delay = SYSCTL_RCGCGPIO_R;        // allow time for clock to start
-  GPIO_PORTF_LOCK_R = 0x4C4F434B;   // 2) unlock GPIO Port F
-  GPIO_PORTF_CR_R |= 0x1F;           // allow changes to PF4-0
-  // only PF0 needs to be unlocked, other bits can't be locked
-  GPIO_PORTF_AMSEL_R &= ~0x1F;        // 3) disable analog on PF
-  GPIO_PORTF_DIR_R &= ~0x1F;          // 5) PF4,PF0 out, PF1 out
-  GPIO_PORTF_AFSEL_R &= ~0x1F;        // 6) disable alt funct on PF1-0
-  GPIO_PORTF_PUR_R |= 0x1F;          // enable pull-up on PF0 and PF1
-  GPIO_PORTF_DEN_R |= 0x1F;          // 7) enable digital I/O on PF1-0
-  GPIO_PORTF_PCTL_R &= ~0x000FFFFF; // configure PF0, 1 as GPIO
-	
-  GPIO_PORTF_IS_R &= ~0x1F;     // (d) PF0, 1 is edge-sensitive
-  GPIO_PORTF_IBE_R &= ~0x1F;    //     PF0, 1 is not both edges
-  GPIO_PORTF_IEV_R &= ~0x1F;    //     PF0, 1 falling edge event
-  GPIO_PORTF_ICR_R = 0x1F;      // (e) clear flag4
-  GPIO_PORTF_IM_R |= 0x1F;      // (f) arm interrupt on PF0, 1 *** No IME bit as mentioned in Book ***
-  NVIC_PRI7_R = (NVIC_PRI7_R&0xFF00FFFF)|0x00A00000; // (g) priority 5
-  NVIC_EN0_R = 0x40000000;      // (h) enable interrupt 30 in NVIC
 }
 void armDisarmPressed(){
 	// Toggles the status of our alarm.
@@ -208,8 +185,9 @@ void CheckDebounce(buttonStatus* buttons, uint8_t numPorts){
 
 void GPIOPortD_Handler(void){
 	// handler for port D -- all 5 buttons
-	uint8_t i;
+	PF2 ^= 0x04;
 	GPIO_PORTD_ICR_R = 0x4F;      // acknowledge flag 0-4
+	uint8_t i;
 	buttonStatus ports[5] = {
 		{PD0, FALSE, &armDisarmPressed},
 		{PD1, FALSE ,&displayModePressed}, 
@@ -225,6 +203,31 @@ void GPIOPortD_Handler(void){
 		}
 	}
 	CheckDebounce(&ports[0], 5);
+}
+
+// deprecated code -- for use if interfacing buttons on Port F
+void ButtonManager_Init_F(){
+	volatile uint32_t delay;
+	
+  SYSCTL_RCGCGPIO_R |= 0x00000020;  // 1) activate clock for Port F
+  delay = SYSCTL_RCGCGPIO_R;        // allow time for clock to start
+  GPIO_PORTF_LOCK_R = 0x4C4F434B;   // 2) unlock GPIO Port F
+  GPIO_PORTF_CR_R |= 0x1F;           // allow changes to PF4-0
+  // only PF0 needs to be unlocked, other bits can't be locked
+  GPIO_PORTF_AMSEL_R &= ~0x1F;        // 3) disable analog on PF
+  GPIO_PORTF_DIR_R &= ~0x1F;          // 5) PF4,PF0 out, PF1 out
+  GPIO_PORTF_AFSEL_R &= ~0x1F;        // 6) disable alt funct on PF1-0
+  GPIO_PORTF_PUR_R |= 0x1F;          // enable pull-up on PF0 and PF1
+  GPIO_PORTF_DEN_R |= 0x1F;          // 7) enable digital I/O on PF1-0
+  GPIO_PORTF_PCTL_R &= ~0x000FFFFF; // configure PF0-4 as GPIO
+	
+  GPIO_PORTF_IS_R &= ~0x1F;     // (d) PF0, 1 is edge-sensitive
+  GPIO_PORTF_IBE_R &= ~0x1F;    //     PF0, 1 is not both edges
+  GPIO_PORTF_IEV_R &= ~0x1F;    //     PF0, 1 falling edge event
+  GPIO_PORTF_ICR_R = 0x1F;      // (e) clear flags
+  GPIO_PORTF_IM_R |= 0x1F;      // (f) arm interrupt on PF0, 1 *** No IME bit as mentioned in Book ***
+  NVIC_PRI7_R = (NVIC_PRI7_R&0xFF00FFFF)|0x00A00000; // (g) priority 5
+  NVIC_EN0_R = 0x40000000;      // (h) enable interrupt 30 in NVIC
 }
 void GPIOPortF_Handler(void){
 	// handler for port F -- all 5 buttons
