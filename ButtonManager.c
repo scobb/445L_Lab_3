@@ -13,6 +13,11 @@
 #define PF2       (*((volatile uint32_t *)0x40025010))
 #define PF3       (*((volatile uint32_t *)0x40025020))
 #define PF4       (*((volatile uint32_t *)0x40025040))
+#define PD0       (*((volatile uint32_t *)0x40007004))
+#define PD1       (*((volatile uint32_t *)0x40007008))
+#define PD2       (*((volatile uint32_t *)0x40007010))
+#define PD3       (*((volatile uint32_t *)0x40007020))
+#define PD6       (*((volatile uint32_t *)0x40007100))
 #define TRUE 1
 #define FALSE 0
 #define NONE 0
@@ -37,7 +42,31 @@ typedef struct {
 	void(*handler)(void);
 } buttonStatus;
 
-
+void ButtonManager_Init_D(){
+	volatile uint32_t delay;
+	
+  SYSCTL_RCGCGPIO_R |= 0x00000008;  // 1) activate clock for Port D
+  delay = SYSCTL_RCGCGPIO_R;        // allow time for clock to start
+  GPIO_PORTD_LOCK_R = 0x4C4F434B;   // 2) unlock GPIO Port F
+  GPIO_PORTD_CR_R |= 0x4F;           // allow changes to PF4-0
+  // only PF0 needs to be unlocked, other bits can't be locked
+  GPIO_PORTD_AMSEL_R &= ~0x4F;        // 3) disable analog on PF
+  GPIO_PORTD_DIR_R &= ~0x4F;          // 5) PF4,PF0 out, PF1 out
+  GPIO_PORTD_AFSEL_R &= ~0x4F;        // 6) disable alt funct on PF1-0
+  GPIO_PORTD_PUR_R |= 0x4F;          // enable pull-up on PF0 and PF1
+  GPIO_PORTD_DEN_R |= 0x4F;          // 7) enable digital I/O on PF1-0
+  GPIO_PORTD_PCTL_R &= ~0x0F00FFFF; // configure PF0, 1 as GPIO
+	
+  GPIO_PORTD_IS_R &= ~0x4F;     // (d) PF0, 1 is edge-sensitive
+  GPIO_PORTD_IBE_R &= ~0x4F;    //     PF0, 1 is not both edges
+  GPIO_PORTD_IEV_R &= ~0x4F;    //     PF0, 1 falling edge event
+  GPIO_PORTD_ICR_R = 0x4F;      // (e) clear flag4
+  GPIO_PORTD_IM_R |= 0x4F;      // (f) arm interrupt on PF0, 1 *** No IME bit as mentioned in Book ***
+  NVIC_PRI0_R = (NVIC_PRI0_R&0x00FFFFFFF)|0x0A000000; // (g) priority 5
+  NVIC_EN0_R = 0x00080000;      // (h) enable interrupt 28 in NVIC
+	
+	
+}
 void ButtonManager_Init(){
 	volatile uint32_t delay;
 	
@@ -123,7 +152,7 @@ void setModePressed(){
 		// display alarm time
 		// if (display_mode == DIGITAL)
 		displayCurrentAlarmTimeDigital();
-		//else displayAlarmAnalog();
+		//else displayCurrentAlarmTimeAnalog();
 		
 		// update H/M button functionality
 		incrementHours = &incrementAlarmHours;
@@ -175,6 +204,27 @@ void CheckDebounce(buttonStatus* buttons, uint8_t numPorts){
 			buttons[i].handler();
 		}
 	}
+}
+
+void GPIOPortD_Handler(void){
+	// handler for port D -- all 5 buttons
+	uint8_t i;
+	GPIO_PORTD_ICR_R = 0x4F;      // acknowledge flag 0-4
+	buttonStatus ports[5] = {
+		{PD0, FALSE, &armDisarmPressed},
+		{PD1, FALSE ,&displayModePressed}, 
+		{PD2, FALSE, &setModePressed},
+		{PD3, FALSE, &hoursPressed},
+		{PD6, FALSE, &minutesPressed}
+	};
+	
+	// check all ports to see if any is low
+	for (i=0; i < 5; i++){
+		if (ports[i].readValue == 0){
+			ports[i].isLow = TRUE;
+		}
+	}
+	CheckDebounce(&ports[0], 5);
 }
 void GPIOPortF_Handler(void){
 	// handler for port F -- all 5 buttons

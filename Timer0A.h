@@ -33,5 +33,7 @@
 void Timer0A_Init(void(*task)(void), uint32_t period);
 void setHandler(void(*task)(void));
 void setAlarmCheck(void(*task)(void));
+void setHeartbeatTask(void(*task)(void));
+
 
 #endif // __TIMER0AINTS_H__

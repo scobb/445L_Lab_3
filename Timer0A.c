@@ -49,6 +49,7 @@ long StartCritical (void);    // previous I bit, disable interrupts
 void EndCritical(long sr);    // restore I bit to previous value
 void WaitForInterrupt(void);  // low power mode
 void (*PeriodicTask)(void);   // user function
+void (*HeartbeatTask)(void);   // user function
 void (*DisplayTask)(void);   // user function
 void (*CheckTask)(void);   // user 
 
@@ -79,10 +80,15 @@ void setHandler(void(*task)(void)){
 void setAlarmCheck(void(*task)(void)){
 	CheckTask = task;
 }
+void setHeartbeatTask(void(*task)(void)){
+	HeartbeatTask = task;
+}
 
 void Timer0A_Handler(void){
   TIMER0_ICR_R = TIMER_ICR_TATOCINT;// acknowledge timer0A timeout
   (*PeriodicTask)();                // increment time
+	if (HeartbeatTask)
+	 (*HeartbeatTask)();
 	if (CheckTask) 										// if alarm is armed
 		(*CheckTask)();									// check if time to sound the alarm
 	if (DisplayTask) {								// if we have a display task
