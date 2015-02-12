@@ -41,13 +41,14 @@ void analogTime() {
 		ST7735_Line(CENTER_X, CENTER_Y, xValsH[my_hourIncrementer], yValsH[my_hourIncrementer], ST7735_Color565(0, 0, 0));
 	}
 	if (my_minutes != time_minutes){
-		if (time_minutes % 5 == 0){
-			drawClock(0, time_minutes/5);
-		}
 		//Draws a black line over the previous value and a green line on the next minute
 		ST7735_Line(CENTER_X, CENTER_Y, xVals[time_minutes-1], yVals[time_minutes-1], ST7735_Color565(0, 0, 0));
 		ST7735_Line(CENTER_X, CENTER_Y, xVals[time_minutes], yVals[time_minutes], ST7735_Color565(0, 255, 0));
 		my_minutes = time_minutes;
+		
+		if (time_minutes % 5 == 0){
+			drawClock(0, time_minutes/5);
+		}
 	}
 	
 	//Now dealing with hours
