@@ -22,7 +22,7 @@ void drawClock(uint8_t drawDashes, uint8_t numToDraw) {
 	
 	if (numToDraw == 0){
 		for (int j = 1; j <= 12; j++){
-			ST7735_SetCursor(analogNumX[j], analogNumY[j]);
+			ST7735_SetCursor(analogNumX[j-1], analogNumY[j-1]);
 			printf("%d", j);
 		}
 	}

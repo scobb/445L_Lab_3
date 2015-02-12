@@ -58,7 +58,7 @@ static int analogDashX[24] = {64, 64, 93, 96, 115, 119, 122,
 static int analogDashY[24] = {5, 0, 13, 9, 35, 32, 64, 64, 
 93, 96, 115, 119, 123, 126, 116, 119, 93, 
 96, 64, 64, 35, 32, 13, 9};
-static int analogNumX[12] = {9, 13, 17, 18, 17, 13, 9, 6, 3, 2, 3, 6};//1st value maybe should be 10?
-static int analogNumY[12] = {1, 1, 3, 6, 8, 11, 11, 11, 8, 6, 3, 1};
+static int analogNumX[12] = {10, 14, 17, 18, 17, 14, 10, 6, 3, 2, 3, 6};//1st value maybe should be 10?
+static int analogNumY[12] = {1, 2, 4, 7, 8, 11, 10, 12, 8, 6, 4, 2};
 
 #endif
