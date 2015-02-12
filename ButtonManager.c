@@ -18,6 +18,10 @@
 #define ALARM 1
 #define TIME 2
 #define NUM_SET_MODES 3
+#define LABEL_X 16
+#define LABEL_Y 126
+#define LABEL_WIDTH 80
+#define LABEL_HEIGHT 20
 
 void(*incrementHours)(void) = 0;
 void(*incrementMinutes)(void) = 0;
@@ -53,7 +57,7 @@ void ButtonManager_Init(){
   NVIC_EN0_R = 0x40000000;      // (h) enable interrupt 30 in NVIC
 }
 void armDisarmPressed(){
-	// PF0 will be our arm/disarm button. Toggles the status of our alarm.
+	// Toggles the status of our alarm.
 	if (alarm_armed){
 		disarmAlarm();
 	} else {
@@ -61,6 +65,7 @@ void armDisarmPressed(){
 	}
 }
 void displayModePressed(){
+	// handler for button press to swap between digital and analog
 	if (display_mode == DIGITAL){
 		ST7735_FillScreen(0);    
 		// ST7735_SetCursor(0,0);
@@ -71,47 +76,73 @@ void displayModePressed(){
 	}
 }
 void incrementAlarmHours(){
+	// handler for button press to update alarm hours
 	++alarm_hours;
 	displayAlarmDigital();
 }
 void incrementAlarmMinutes(){
+	// handler for button press to update alarm minutes
 	++alarm_minutes;
 	displayAlarmDigital();
 }
 void incrementTimeHours(){
+	// handler for button press to update time hours
 	++time_hours;
 	displayDigital();
 }
 void incrementTimeMinutes(){
+	// handler for button press to update time minutes
 	++time_minutes;
 	displayDigital();
 }
 void setModePressed(){
+	// changes whether we're setting time, setting alarm, or neither
 	set_mode = (set_mode + 1 ) % NUM_SET_MODES;
 	if (set_mode == NONE){
+		ST7735_FillRect(LABEL_X, LABEL_Y, LABEL_WIDTH, LABEL_HEIGHT, 0);
+		// normal operation; disable H/M button presses
 		incrementHours = 0;
 		incrementMinutes = 0;
 	} else if (set_mode == ALARM){
-		// disable real time scree updates
-		Clock_setDisplayFunction(0);
+		// set alarm mode
+		// disable real time screen updates
+		Clock_setDisplayFunction(0);  
 		
-		// clear screen
-		ST7735_FillScreen(0);    
+		// display label
+		ST7735_FillRect(LABEL_X, LABEL_Y, LABEL_WIDTH, LABEL_HEIGHT, 0);
+		ST7735_SetCursor(3,13);
+		printf("set alarm");
 		
 		// display alarm time
 		// if (display_mode == DIGITAL)
 		displayCurrentAlarmTimeDigital();
 		//else displayAlarmAnalog();
 		
+		// update H/M button functionality
 		incrementHours = &incrementAlarmHours;
 		incrementMinutes = &incrementAlarmMinutes;
 	} else {
+		// set time mode
+		
+		// clear screen
+		// ST7735_FillScreen(0);    
+		
+		// display label
+		ST7735_FillRect(LABEL_X, LABEL_Y, LABEL_WIDTH, LABEL_HEIGHT, 0);
+		ST7735_SetCursor(3,13);
+		printf("set time");
+
 		if (display_mode == DIGITAL) {
+			// show the current time in full
 			displayCurrentTimeDigital();
+			
+			// resume real time updates
 			Clock_setDisplayFunction(&displayDigital);
 		} else {
 			Clock_setDisplayFunction(&analogTime);
 		}
+		
+		// update H/M button functionality
 		incrementHours = &incrementTimeHours;
 		incrementMinutes = &incrementTimeMinutes;
 	}
@@ -123,7 +154,7 @@ void hoursPressed(){
 		(*incrementHours)();
 }
 void minutesPressed(){
-	// HOURS button
+	// MINUTES button
 	if (incrementMinutes)
 		(*incrementMinutes)();
 }
@@ -132,6 +163,7 @@ void CheckDebounce(buttonStatus* buttons, uint8_t numPorts){
 	uint8_t i;
 	SysTick_Wait10ms(40);
 	for (i=0; i < numPorts; ++i){
+		// if a button was low before and is still low, call its handler
 		if (buttons[i].isLow && buttons[i].readValue == 0){
 			buttons[i].handler();
 		}
@@ -148,6 +180,8 @@ void GPIOPortF_Handler(void){
 		{PF3, FALSE, &hoursPressed},
 		{PF4, FALSE, &minutesPressed}
 	};
+	
+	// check all ports to see if any is low
 	for (i=0; i < 5; i++){
 		if (ports[i].readValue == 0){
 			ports[i].isLow = TRUE;
