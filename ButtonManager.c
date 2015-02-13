@@ -44,7 +44,6 @@ typedef struct {
 
 void ButtonManager_Init(){
 	volatile uint32_t delay;
-	PF2 = 0x04;
 	
   SYSCTL_RCGCGPIO_R |= 0x00000008;  // 1) activate clock for Port D
   delay = SYSCTL_RCGCGPIO_R;        // allow time for clock to start
@@ -185,7 +184,6 @@ void CheckDebounce(buttonStatus* buttons, uint8_t numPorts){
 
 void GPIOPortD_Handler(void){
 	// handler for port D -- all 5 buttons
-	PF2 ^= 0x04;
 	GPIO_PORTD_ICR_R = 0x4F;      // acknowledge flag 0-4
 	uint8_t i;
 	buttonStatus ports[5] = {

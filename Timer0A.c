@@ -69,7 +69,7 @@ void Timer0A_Init(void(*task)(void), uint32_t period){long sr;
   TIMER0_TAPR_R = 0;               // 5) 12.5ns timer0A
   TIMER0_ICR_R = 0x00000001;       // 6) clear timer0A timeout flag
   TIMER0_IMR_R |= 0x00000001;      // 7) arm timeout interrupt
-  NVIC_PRI4_R = (NVIC_PRI4_R&0x00FFFFFF)|0x40000000; // 8) priority 2
+  NVIC_PRI4_R = (NVIC_PRI4_R&0x00FFFFFF)|0x60000000; // 8) priority 3
   NVIC_EN0_R |= NVIC_EN0_INT19;     // 9) enable interrupt 19 in NVIC
   TIMER0_CTL_R |= 0x00000001;      // 10) enable timer0A
   EndCritical(sr);
