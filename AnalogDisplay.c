@@ -4,6 +4,7 @@
 #include "ST7735_Line.h"
 #include "inc/tm4c123gh6pm.h"
 #include "AnalogDisplay.h"
+#include "Alarm.h"
 
 #define CENTER_X 64
 #define CENTER_Y 64
@@ -37,6 +38,26 @@ void drawClock(uint8_t drawDashes, uint8_t numToDraw) {
 	ST7735_Line(CENTER_X, CENTER_Y, xValsH[(time_hours*5)+(time_minutes/12)], yValsH[(time_hours*5)+(time_minutes/12)], ST7735_Color565(0, 0, 255));
 }
 
+void displayCurrentAlarmTimeAnalog() {
+	//We are going to use drawClock, but use alarm time instead of time
+	ST7735_SetCursor(0, 0);
+	ST7735_FillRect(0, 0, 128, 128, 0);
+	//This will draw all of the clock dashes
+	for (int i = 0; i < 24; i+=2){
+		ST7735_Line(analogDashX[i], analogDashY[i], analogDashX[i+1], analogDashY[i+1], ST7735_Color565(255, 255, 255));
+	}
+	
+	for (int j = 1; j <= 12; j++){
+		ST7735_SetCursor(analogNumX[j-1], analogNumY[j-1]);
+		printf("%d", j);
+	}
+	
+	//Need to draw hour/minute hands immediately upon drawing
+	ST7735_Line(CENTER_X, CENTER_Y, xVals[alarm_minutes], yVals[alarm_minutes], ST7735_Color565(0, 255, 0));
+	ST7735_Line(CENTER_X, CENTER_Y, xValsH[(alarm_hours*5)+(alarm_minutes/12)], yValsH[(alarm_hours*5)+(alarm_minutes/12)], ST7735_Color565(0, 0, 255));
+
+}
+
 void analogTime() {
 	static uint16_t my_minutes = 0;
 	static uint16_t my_hourIncrementer = 0;
@@ -44,6 +65,7 @@ void analogTime() {
 	//Before we do anything, let's check to see if the hour/minute hands are currently overlapping
 	if (my_hourIncrementer == my_minutes){
 		ST7735_Line(CENTER_X, CENTER_Y, xValsH[my_hourIncrementer], yValsH[my_hourIncrementer], ST7735_Color565(0, 0, 0));
+		ST7735_Line(CENTER_X, CENTER_Y, xVals[time_minutes], yVals[time_minutes], ST7735_Color565(0, 255, 0));
 	}
 	if (my_minutes != time_minutes){
 		//Draws a black line over the previous value and a green line on the next minute
@@ -65,11 +87,47 @@ void analogTime() {
 	//Will erase previous hour hand in case of an update
 	ST7735_Line(CENTER_X, CENTER_Y, xValsH[my_hourIncrementer], yValsH[my_hourIncrementer], ST7735_Color565(0, 0, 0));
 	my_hourIncrementer = (time_hours*5)+(time_minutes/12);
-	/*
-	if (time_minutes % 12 == 0){
-		ST7735_Line(CENTER_X, CENTER_Y, xValsH[my_hourIncrementer-1], yValsH[my_hourIncrementer-1], ST7735_Color565(0, 0, 0));
+	
+	ST7735_Line(CENTER_X, CENTER_Y, xValsH[my_hourIncrementer], yValsH[my_hourIncrementer], ST7735_Color565(0, 0, 255));
+	if (my_hourIncrementer >= MINUTES_PER_HOUR){
+		my_hourIncrementer = 0;
 	}
-	*/
+}
+
+void analogAlarmTime() {
+	static uint16_t my_minutes = 0;
+	static uint16_t my_hourIncrementer = 0;
+	
+	//Before we do anything, let's check to see if the hour/minute hands are currently overlapping
+	if (my_hourIncrementer == my_minutes){
+		ST7735_Line(CENTER_X, CENTER_Y, xValsH[my_hourIncrementer], yValsH[my_hourIncrementer], ST7735_Color565(0, 0, 0));
+		ST7735_Line(CENTER_X, CENTER_Y, xVals[alarm_minutes], yVals[alarm_minutes], ST7735_Color565(0, 255, 0));
+	}
+	if (my_minutes != alarm_minutes){
+		//Draws a black line over the previous value and a green line on the next minute
+		if (alarm_minutes > my_minutes+1){
+			//Just in case minutes is updated by more than 1
+			ST7735_Line(CENTER_X, CENTER_Y, xVals[my_minutes], yVals[my_minutes], ST7735_Color565(0, 0, 0));
+		}
+		//We will also erase right behind us, to eliminate any possibility of multiple minute hands
+		ST7735_Line(CENTER_X, CENTER_Y, xVals[alarm_minutes-1], yVals[alarm_minutes-1], ST7735_Color565(0, 0, 0));
+		ST7735_Line(CENTER_X, CENTER_Y, xVals[alarm_minutes], yVals[alarm_minutes], ST7735_Color565(0, 255, 0));
+		my_minutes = alarm_minutes;
+		
+		//The greater than 3 condition is so we don't draw a 0 on the screen
+		if (alarm_minutes % 5 != 3 && alarm_minutes > 3){
+			ST7735_SetCursor(analogNumX[(alarm_minutes+2)/5-1], analogNumY[(alarm_minutes+2)/5-1]);
+			printf("%d", (alarm_minutes+2)/5);
+		}
+	}
+	
+	//Now dealing with hours
+	//Will erase previous hour hand in case of an update
+	if (my_hourIncrementer != my_minutes) {
+		ST7735_Line(CENTER_X, CENTER_Y, xValsH[my_hourIncrementer], yValsH[my_hourIncrementer], ST7735_Color565(0, 0, 0));
+	}
+	my_hourIncrementer = (alarm_hours*5)+(alarm_minutes/12);
+	
 	ST7735_Line(CENTER_X, CENTER_Y, xValsH[my_hourIncrementer], yValsH[my_hourIncrementer], ST7735_Color565(0, 0, 255));
 	if (my_hourIncrementer >= MINUTES_PER_HOUR){
 		my_hourIncrementer = 0;

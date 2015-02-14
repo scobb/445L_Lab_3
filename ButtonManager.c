@@ -90,12 +90,14 @@ void displayModePressed(){
 void incrementAlarmHours(){
 	// handler for button press to update alarm hours
 	++alarm_hours;
-	displayAlarmDigital();
+	if (display_mode == DIGITAL) {displayAlarmDigital();}
+	else {analogAlarmTime();}
 }
 void incrementAlarmMinutes(){
 	// handler for button press to update alarm minutes
 	++alarm_minutes;
-	displayAlarmDigital();
+	if (display_mode == DIGITAL) {displayAlarmDigital();}
+	else {analogAlarmTime();}
 }
 void incrementTimeHours(){
 	// handler for button press to update time hours
@@ -128,9 +130,8 @@ void setModePressed(){
 		printf("set alarm");
 		
 		// display alarm time
-		// if (display_mode == DIGITAL)
-		displayCurrentAlarmTimeDigital();
-		//else displayCurrentAlarmTimeAnalog();
+		if (display_mode == DIGITAL) {displayCurrentAlarmTimeDigital();}
+		else {displayCurrentAlarmTimeAnalog();}
 		
 		// update H/M button functionality
 		incrementHours = &incrementAlarmHours;
