@@ -100,12 +100,14 @@ void incrementAlarmMinutes(){
 void incrementTimeHours(){
 	// handler for button press to update time hours
 	++time_hours;
-	displayDigital();
+	if (display_mode == DIGITAL) {displayDigital();}
+	else {analogTime();}
 }
 void incrementTimeMinutes(){
 	// handler for button press to update time minutes
 	++time_minutes;
-	displayDigital();
+	if (display_mode == DIGITAL) {displayDigital();}
+	else {analogTime();}
 }
 void setModePressed(){
 	// changes whether we're setting time, setting alarm, or neither
@@ -151,6 +153,7 @@ void setModePressed(){
 			// resume real time updates
 			Clock_setDisplayFunction(&displayDigital);
 		} else {
+			drawClock(1, 0);
 			Clock_setDisplayFunction(&analogTime);
 		}
 		

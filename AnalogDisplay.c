@@ -38,7 +38,7 @@ void drawClock(uint8_t drawDashes, uint8_t numToDraw) {
 }
 
 void analogTime() {
-	static uint16_t my_minutes = -1;
+	static uint16_t my_minutes = 0;
 	static uint16_t my_hourIncrementer = 0;
 	
 	//Before we do anything, let's check to see if the hour/minute hands are currently overlapping
@@ -47,6 +47,11 @@ void analogTime() {
 	}
 	if (my_minutes != time_minutes){
 		//Draws a black line over the previous value and a green line on the next minute
+		if (time_minutes > my_minutes+1){
+			//Just in case minutes is updated by more than 1
+			ST7735_Line(CENTER_X, CENTER_Y, xVals[my_minutes], yVals[my_minutes], ST7735_Color565(0, 0, 0));
+		}
+		//We will also erase right behind us, to eliminate any possibility of multiple minute hands
 		ST7735_Line(CENTER_X, CENTER_Y, xVals[time_minutes-1], yVals[time_minutes-1], ST7735_Color565(0, 0, 0));
 		ST7735_Line(CENTER_X, CENTER_Y, xVals[time_minutes], yVals[time_minutes], ST7735_Color565(0, 255, 0));
 		my_minutes = time_minutes;
@@ -56,11 +61,15 @@ void analogTime() {
 		}
 	}
 	
-	my_hourIncrementer = (time_hours*5)+(time_minutes/12);
 	//Now dealing with hours
+	//Will erase previous hour hand in case of an update
+	ST7735_Line(CENTER_X, CENTER_Y, xValsH[my_hourIncrementer], yValsH[my_hourIncrementer], ST7735_Color565(0, 0, 0));
+	my_hourIncrementer = (time_hours*5)+(time_minutes/12);
+	/*
 	if (time_minutes % 12 == 0){
 		ST7735_Line(CENTER_X, CENTER_Y, xValsH[my_hourIncrementer-1], yValsH[my_hourIncrementer-1], ST7735_Color565(0, 0, 0));
 	}
+	*/
 	ST7735_Line(CENTER_X, CENTER_Y, xValsH[my_hourIncrementer], yValsH[my_hourIncrementer], ST7735_Color565(0, 0, 255));
 	if (my_hourIncrementer >= MINUTES_PER_HOUR){
 		my_hourIncrementer = 0;
