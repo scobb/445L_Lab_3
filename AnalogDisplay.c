@@ -31,6 +31,10 @@ void drawClock(uint8_t drawDashes, uint8_t numToDraw) {
 		ST7735_SetCursor(analogNumX[numToDraw-1], analogNumY[numToDraw-1]);
 		printf("%d", numToDraw);
 	}
+	
+	//Need to draw hour/minute hands immediately upon drawing
+	ST7735_Line(CENTER_X, CENTER_Y, xVals[time_minutes], yVals[time_minutes], ST7735_Color565(0, 255, 0));
+	ST7735_Line(CENTER_X, CENTER_Y, xValsH[(time_hours*5)+(time_minutes/12)], yValsH[(time_hours*5)+(time_minutes/12)], ST7735_Color565(0, 0, 255));
 }
 
 void analogTime() {
@@ -47,14 +51,14 @@ void analogTime() {
 		ST7735_Line(CENTER_X, CENTER_Y, xVals[time_minutes], yVals[time_minutes], ST7735_Color565(0, 255, 0));
 		my_minutes = time_minutes;
 		
-		if (time_minutes % 5 == 0){
-			drawClock(0, time_minutes/5);
+		if (time_minutes % 5 != 3){
+			drawClock(0, (time_minutes+2)/5);//Should redraw the right number for 4 out of 5 minutes; changed for padding
 		}
 	}
 	
+	my_hourIncrementer = (time_hours*5)+(time_minutes/12);
 	//Now dealing with hours
 	if (time_minutes % 12 == 0){
-		my_hourIncrementer = my_hourIncrementer + 1;
 		ST7735_Line(CENTER_X, CENTER_Y, xValsH[my_hourIncrementer-1], yValsH[my_hourIncrementer-1], ST7735_Color565(0, 0, 0));
 	}
 	ST7735_Line(CENTER_X, CENTER_Y, xValsH[my_hourIncrementer], yValsH[my_hourIncrementer], ST7735_Color565(0, 0, 255));
