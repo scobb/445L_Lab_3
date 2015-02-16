@@ -74,7 +74,12 @@ void analogTime() {
 			ST7735_Line(CENTER_X, CENTER_Y, xVals[my_minutes], yVals[my_minutes], ST7735_Color565(0, 0, 0));
 		}
 		//We will also erase right behind us, to eliminate any possibility of multiple minute hands
-		ST7735_Line(CENTER_X, CENTER_Y, xVals[time_minutes-1], yVals[time_minutes-1], ST7735_Color565(0, 0, 0));
+		if (time_minutes == 0){
+			ST7735_Line(CENTER_X, CENTER_Y, xVals[59], yVals[59], ST7735_Color565(0, 0, 0));
+		}
+		else {
+			ST7735_Line(CENTER_X, CENTER_Y, xVals[time_minutes-1], yVals[time_minutes-1], ST7735_Color565(0, 0, 0));
+		}
 		ST7735_Line(CENTER_X, CENTER_Y, xVals[time_minutes], yVals[time_minutes], ST7735_Color565(0, 255, 0));
 		my_minutes = time_minutes;
 		
@@ -103,6 +108,16 @@ void analogAlarmTime() {
 		ST7735_Line(CENTER_X, CENTER_Y, xValsH[my_hourIncrementer], yValsH[my_hourIncrementer], ST7735_Color565(0, 0, 0));
 		ST7735_Line(CENTER_X, CENTER_Y, xVals[alarm_minutes], yVals[alarm_minutes], ST7735_Color565(0, 255, 0));
 	}
+	
+	//Now let's see if we are at 60 minutes. If so, we need to to set it down to 0
+	if (alarm_minutes >= 60){
+		alarm_minutes = 0;
+		alarm_hours++;
+		if (alarm_hours == 12){
+			alarm_hours = 0;
+		}
+	}
+	
 	if (my_minutes != alarm_minutes){
 		//Draws a black line over the previous value and a green line on the next minute
 		if (alarm_minutes > my_minutes+1){
@@ -110,7 +125,12 @@ void analogAlarmTime() {
 			ST7735_Line(CENTER_X, CENTER_Y, xVals[my_minutes], yVals[my_minutes], ST7735_Color565(0, 0, 0));
 		}
 		//We will also erase right behind us, to eliminate any possibility of multiple minute hands
-		ST7735_Line(CENTER_X, CENTER_Y, xVals[alarm_minutes-1], yVals[alarm_minutes-1], ST7735_Color565(0, 0, 0));
+		if (alarm_minutes == 0){
+			ST7735_Line(CENTER_X, CENTER_Y, xVals[59], yVals[59], ST7735_Color565(0, 0, 0));
+		}
+		else {
+			ST7735_Line(CENTER_X, CENTER_Y, xVals[alarm_minutes-1], yVals[alarm_minutes-1], ST7735_Color565(0, 0, 0));
+		}
 		ST7735_Line(CENTER_X, CENTER_Y, xVals[alarm_minutes], yVals[alarm_minutes], ST7735_Color565(0, 255, 0));
 		my_minutes = alarm_minutes;
 		
