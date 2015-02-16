@@ -64,11 +64,6 @@ int main(void){
 	Heartbeat_Init();
 	ButtonManager_Init();				// initializes edge-triggered interrupts for PF0, PF1, active LOW
   EnableInterrupts();           // (i) Clears the I bit
-	/*draw1(13, 50);
-	draw2(45, 50);
-	draw3(85, 50);
-	draw4(113, 50);
-	drawColon(50, 64);*/
   while(1){
   }
 }

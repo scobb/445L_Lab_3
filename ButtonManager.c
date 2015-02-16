@@ -80,11 +80,18 @@ void armDisarmPressed(){
 void displayModePressed(){
 	// handler for button press to swap between digital and analog
 	if (display_mode == DIGITAL){
+		Clock_setDisplayFunction(&displayMilitary);
+		ST7735_FillRect(0, 0, 128, 128, 0);  
+		enableMilitaryDisplay();
+	} else if (display_mode == MILITARY){
+		wasAnalog = TRUE;
 		Clock_setDisplayFunction(&analogTime);
 		ST7735_FillRect(0, 0, 128, 128, 0); 
-		// ST7735_SetCursor(0,0);
 		enableAnalogDisplay();
-	} else {
+		
+	}
+	 else {
+		wasAnalog = FALSE;
 		Clock_setDisplayFunction(&displayDigital);
 		ST7735_FillRect(0, 0, 128, 128, 0);  
 		enableDigitalDisplay();
@@ -93,33 +100,32 @@ void displayModePressed(){
 void incrementAlarmHours(){
 	// handler for button press to update alarm hours
 	++alarm_hours;
-	if (display_mode == DIGITAL) {displayAlarmDigital();}
-	else {analogAlarmTime();}
+	if (display_mode != MILITARY) {displayAlarmDigital();}
+	else {displayAlarmMilitary();}
 }
 void incrementAlarmMinutes(){
 	// handler for button press to update alarm minutes
 	++alarm_minutes;
-	if (display_mode == DIGITAL) {displayAlarmDigital();}
-	else {analogAlarmTime();}
+	if (display_mode != MILITARY) {displayAlarmDigital();}
+	else {displayAlarmMilitary();}
 }
 void incrementTimeHours(){
 	// handler for button press to update time hours
 	++time_hours;
-	if (display_mode == DIGITAL) {displayDigital();}
-	else {analogTime();}
+	if (display_mode != MILITARY) {displayDigital();}
+	else {displayMilitary();}
 }
 void incrementTimeMinutes(){
 	// handler for button press to update time minutes
 	++time_minutes;
-	if (display_mode == DIGITAL) {displayDigital();}
-	else {analogTime();}
+	if (display_mode != MILITARY) {displayDigital();}
+	else {displayMilitary();}
 }
 void setModePressed(){
 	// changes whether we're setting time, setting alarm, or neither
 	set_mode = (set_mode + 1 ) % NUM_SET_MODES;
 	if (set_mode == NONE){
-		if (wasAnalog == TRUE){
-			wasAnalog = FALSE;
+		if (wasAnalog){
 			enableAnalogDisplay();
 		}
 		ST7735_FillRect(LABEL_X, LABEL_Y, LABEL_WIDTH, LABEL_HEIGHT, 0);
@@ -138,7 +144,9 @@ void setModePressed(){
 		
 		// display alarm time
 		ST7735_FillRect(0, 0, 127, 127, 0);
-		displayCurrentAlarmTimeDigital();
+		if (display_mode != MILITARY) {
+			displayCurrentAlarmTimeDigital();
+		} else {displayCurrentAlarmTimeMilitary();}
 		
 		// update H/M button functionality
 		incrementHours = &incrementAlarmHours;
@@ -154,26 +162,15 @@ void setModePressed(){
 		ST7735_SetCursor(3,13);
 		printf("set time");
 
-		if (display_mode == ANALOG){
-			//Need to set wasAnalog
-			wasAnalog = TRUE;
-		}
-		displayCurrentTimeDigital();
-		
-		// resume real time updates
-		Clock_setDisplayFunction(&displayDigital);
-		/*
-		if (display_mode == DIGITAL) {
-			// show the current time in full
+		if (display_mode != MILITARY){
 			displayCurrentTimeDigital();
 			
 			// resume real time updates
 			Clock_setDisplayFunction(&displayDigital);
 		} else {
-			drawClock(1, 0);
-			Clock_setDisplayFunction(&analogTime);
+			displayCurrentTimeMilitary();
+			Clock_setDisplayFunction(&displayMilitary);
 		}
-		*/
 		
 		// update H/M button functionality
 		incrementHours = &incrementTimeHours;

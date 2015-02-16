@@ -61,5 +61,4 @@ void checkAlarm(){
 void alarmHandler(){
 	// toggle GPIO for speaker output
 	E1 ^= 0x02;
-	
 }
