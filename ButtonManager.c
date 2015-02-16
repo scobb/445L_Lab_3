@@ -36,6 +36,7 @@
 void(*incrementHours)(void) = 0;
 void(*incrementMinutes)(void) = 0;
 uint8_t set_mode = NONE;
+uint8_t wasAnalog = FALSE;
 typedef struct {
   uint32_t readValue;
 	uint8_t isLow;
@@ -79,10 +80,12 @@ void armDisarmPressed(){
 void displayModePressed(){
 	// handler for button press to swap between digital and analog
 	if (display_mode == DIGITAL){
+		Clock_setDisplayFunction(&analogTime);
 		ST7735_FillRect(0, 0, 128, 128, 0); 
 		// ST7735_SetCursor(0,0);
 		enableAnalogDisplay();
 	} else {
+		Clock_setDisplayFunction(&displayDigital);
 		ST7735_FillRect(0, 0, 128, 128, 0);  
 		enableDigitalDisplay();
 	}
@@ -115,6 +118,10 @@ void setModePressed(){
 	// changes whether we're setting time, setting alarm, or neither
 	set_mode = (set_mode + 1 ) % NUM_SET_MODES;
 	if (set_mode == NONE){
+		if (wasAnalog == TRUE){
+			wasAnalog = FALSE;
+			enableAnalogDisplay();
+		}
 		ST7735_FillRect(LABEL_X, LABEL_Y, LABEL_WIDTH, LABEL_HEIGHT, 0);
 		// normal operation; disable H/M button presses
 		incrementHours = 0;
@@ -130,8 +137,8 @@ void setModePressed(){
 		printf("set alarm");
 		
 		// display alarm time
-		if (display_mode == DIGITAL) {displayCurrentAlarmTimeDigital();}
-		else {displayCurrentAlarmTimeAnalog();}
+		ST7735_FillRect(0, 0, 127, 127, 0);
+		displayCurrentAlarmTimeDigital();
 		
 		// update H/M button functionality
 		incrementHours = &incrementAlarmHours;
@@ -147,6 +154,15 @@ void setModePressed(){
 		ST7735_SetCursor(3,13);
 		printf("set time");
 
+		if (display_mode == ANALOG){
+			//Need to set wasAnalog
+			wasAnalog = TRUE;
+		}
+		displayCurrentTimeDigital();
+		
+		// resume real time updates
+		Clock_setDisplayFunction(&displayDigital);
+		/*
 		if (display_mode == DIGITAL) {
 			// show the current time in full
 			displayCurrentTimeDigital();
@@ -157,6 +173,7 @@ void setModePressed(){
 			drawClock(1, 0);
 			Clock_setDisplayFunction(&analogTime);
 		}
+		*/
 		
 		// update H/M button functionality
 		incrementHours = &incrementTimeHours;
