@@ -17,7 +17,7 @@
 #define MILITARY_MINUTE_RIGHT_X 122
 #define ALL_Y 50
 #define AM_PIXEL_X 100
-#define AM_PIXEL_Y 144
+#define AM_PIXEL_Y 124
 #define AM_X 17
 #define AM_Y 13
 #define AM_WIDTH 16

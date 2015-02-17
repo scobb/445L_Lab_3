@@ -107,12 +107,13 @@ void displayModePressed(){
 		Clock_setDisplayFunction(&displayMilitary);
 		ST7735_FillRect(0, 0, 128, 128, 0);  
 		enableMilitaryDisplay();
+		hideAmPm();
 	} else if (display_mode == MILITARY){
 		wasAnalog = TRUE;
 		Clock_setDisplayFunction(&analogTime);
 		ST7735_FillRect(0, 0, 128, 128, 0); 
 		enableAnalogDisplay();
-		
+		displayAmPm();
 	}
 	 else {
 		wasAnalog = FALSE;

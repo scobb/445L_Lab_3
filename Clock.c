@@ -56,6 +56,6 @@ void Clock_Init(){
 	
 	// set up timer 0A
   // Timer0A_Init(&increment_time, CYCLES_PER_SECOND);
-	Timer0A_Init(&debug_increment_time, CYCLES_PER_SECOND);
+	Timer0A_Init(&increment_time, CYCLES_PER_SECOND);
 	
 }
