@@ -16,11 +16,39 @@
 #define MILITARY_MINUTE_LEFT_X 92
 #define MILITARY_MINUTE_RIGHT_X 122
 #define ALL_Y 50
+#define AM_PIXEL_X 100
+#define AM_PIXEL_Y 144
+#define AM_X 17
+#define AM_Y 13
+#define AM_WIDTH 16
+#define AM_HEIGHT 16
 typedef struct{
 	void(*left)(uint16_t, uint16_t);
 	void(*right)(uint16_t, uint16_t);
 } displayCell;
 
+void hideAmPm(){
+	ST7735_FillRect(AM_PIXEL_X, AM_PIXEL_Y, AM_WIDTH, AM_HEIGHT, 0);
+}
+void displayAlarmAmPm() {
+	hideAmPm();
+	ST7735_SetCursor(AM_X, AM_Y);
+	if (alarm_hours >= 12){
+		printf("pm");
+	} else {
+		printf("am");
+	}
+}
+	
+void displayAmPm(){
+	hideAmPm();
+	ST7735_SetCursor(AM_X, AM_Y);
+	if (time_hours >= 12){
+		printf("pm");
+	} else {
+		printf("am");
+	}
+}
 displayCell militaryHourDisplayMap[] = {
 	{&draw0, &draw0},
 	{&draw0, &draw1},
@@ -86,12 +114,14 @@ void displayCurrentTimeDigital(){
 	(*hourDisplayMap[display_hours].left)(HOUR_LEFT_X, ALL_Y);
 	(*hourDisplayMap[display_hours].right)(HOUR_RIGHT_X, ALL_Y);
 	drawColon(COLON_X, COLON_Y);
+	displayAmPm();
 }
 void displayCurrentTimeMilitary(){
 	(*minuteDisplayMap[time_minutes].left)(MILITARY_MINUTE_LEFT_X, ALL_Y);
 	(*minuteDisplayMap[time_minutes].right)(MILITARY_MINUTE_RIGHT_X, ALL_Y);
 	(*militaryHourDisplayMap[time_hours].left)(MILITARY_HOUR_LEFT_X, ALL_Y);
 	(*militaryHourDisplayMap[time_hours].right)(MILITARY_HOUR_RIGHT_X, ALL_Y);
+	hideAmPm();
 }
 void displayCurrentAlarmTimeDigital(){
 	// draws the full time regardless of previous time-- for use initializations
@@ -103,12 +133,16 @@ void displayCurrentAlarmTimeDigital(){
 	(*hourDisplayMap[display_hours].left)(HOUR_LEFT_X, ALL_Y);
 	(*hourDisplayMap[display_hours].right)(HOUR_RIGHT_X, ALL_Y);
 	drawColon(COLON_X, COLON_Y);
+	ST7735_FillRect(AM_PIXEL_X, AM_PIXEL_Y, AM_WIDTH, AM_HEIGHT, 0);
+	ST7735_SetCursor(AM_X, AM_Y);
+	displayAlarmAmPm();
 }
 void displayCurrentAlarmTimeMilitary(){
 	(*minuteDisplayMap[alarm_minutes].left)(MILITARY_MINUTE_LEFT_X, ALL_Y);
 	(*minuteDisplayMap[alarm_minutes].right)(MILITARY_MINUTE_RIGHT_X, ALL_Y);
 	(*militaryHourDisplayMap[alarm_hours].left)(MILITARY_HOUR_LEFT_X, ALL_Y);
 	(*militaryHourDisplayMap[alarm_hours].right)(MILITARY_HOUR_RIGHT_X, ALL_Y);
+	hideAmPm();
 }
 void enableMilitaryDisplay(){
 	display_mode = MILITARY;
@@ -156,6 +190,7 @@ void displayAlarmMilitary(){
 	static uint16_t my_hours = -1;
 	my_minutes = redraw_alarm_minutes(MILITARY_MINUTE_LEFT_X, MILITARY_MINUTE_RIGHT_X, my_minutes);
 	my_hours = redraw_alarm_hours(MILITARY_HOUR_LEFT_X, MILITARY_HOUR_RIGHT_X, my_hours, TRUE);
+	hideAmPm();
 }
 void displayAlarmDigital(){
 	// draw spot 1
@@ -164,7 +199,7 @@ void displayAlarmDigital(){
 	
 	my_minutes = redraw_alarm_minutes(MINUTE_LEFT_X, MINUTE_RIGHT_X, my_minutes);
   my_hours = redraw_alarm_hours(HOUR_LEFT_X, HOUR_RIGHT_X, my_hours, FALSE);
-	
+	displayAlarmAmPm();
 }
 
 uint16_t redraw_minutes(uint8_t left, uint8_t right, uint16_t my_minutes){
@@ -204,6 +239,7 @@ void displayMilitary(){
 	
 	my_minutes = redraw_minutes(MILITARY_MINUTE_LEFT_X, MILITARY_MINUTE_RIGHT_X, my_minutes);
 	my_hours = redraw_hours(MILITARY_HOUR_LEFT_X, MILITARY_HOUR_RIGHT_X, my_hours, TRUE);
+	hideAmPm();
 }
 	
 void displayDigital(){
@@ -212,4 +248,5 @@ void displayDigital(){
 	
 	my_minutes = redraw_minutes(MINUTE_LEFT_X, MINUTE_RIGHT_X, my_minutes);
 	my_hours = redraw_hours(HOUR_LEFT_X, HOUR_RIGHT_X, my_hours, FALSE);
+	displayAmPm();
 }

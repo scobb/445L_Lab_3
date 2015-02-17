@@ -24,13 +24,13 @@
 #define ALARM 1
 #define TIME 2
 #define NUM_SET_MODES 3
-#define SPEAKER_X 96
-#define SPEAKER_Y 140
+#define SPEAKER_X 80
+#define SPEAKER_Y 144
 #define SPEAKER_WIDTH 16
 #define SPEAKER_HEIGHT 15
 #define LABEL_X 16
 #define LABEL_Y 126
-#define LABEL_WIDTH 80
+#define LABEL_WIDTH 60
 #define LABEL_HEIGHT 20
 #define TOGGLE 1
 #define INCREMENT 1

@@ -10,5 +10,7 @@ void displayCurrentTimeDigital();
 void displayCurrentTimeMilitary();
 void displayCurrentAlarmTimeDigital();
 void displayCurrentAlarmTimeMilitary();
+void displayAmPm();
+void hideAmPm();
 
 #endif
