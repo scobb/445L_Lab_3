@@ -32,10 +32,17 @@
 #define LABEL_Y 126
 #define LABEL_WIDTH 80
 #define LABEL_HEIGHT 20
-
+#define TOGGLE 1
+#define INCREMENT 1
+#define DECREMENT 0
+#define PLUS_X 110
+#define PLUS_Y 0
+#define PLUS_WIDTH 9
+#define PLUS_HEIGHT 18
 void(*incrementHours)(void) = 0;
 void(*incrementMinutes)(void) = 0;
 uint8_t set_mode = NONE;
+uint8_t increment_mode = INCREMENT;
 uint8_t wasAnalog = FALSE;
 typedef struct {
   uint32_t readValue;
@@ -77,9 +84,26 @@ void armDisarmPressed(){
 		armAlarm();
 	}
 }
+void hideIncrementMode(){
+	ST7735_FillRect(PLUS_X, PLUS_Y, PLUS_WIDTH, PLUS_HEIGHT, 0);
+}
+void displayIncrementMode(){
+	hideIncrementMode();
+	ST7735_SetCursor(19,1);
+	if (increment_mode == INCREMENT)
+		printf("+");
+	else printf("-");
+}
+void toggleIncrementMode(){
+	increment_mode ^= TOGGLE;
+	displayIncrementMode();
+}
 void displayModePressed(){
 	// handler for button press to swap between digital and analog
-	if (display_mode == DIGITAL){
+	if (set_mode != NONE){
+		toggleIncrementMode();
+	}
+	else if (display_mode == DIGITAL){
 		Clock_setDisplayFunction(&displayMilitary);
 		ST7735_FillRect(0, 0, 128, 128, 0);  
 		enableMilitaryDisplay();
@@ -99,25 +123,41 @@ void displayModePressed(){
 }
 void incrementAlarmHours(){
 	// handler for button press to update alarm hours
-	++alarm_hours;
+	if (increment_mode == INCREMENT) {
+		alarm_hours = (alarm_hours + 1) % HOURS_PER_DAY;
+	}
+	else alarm_hours = (alarm_hours + 23) % HOURS_PER_DAY;
 	if (display_mode != MILITARY) {displayAlarmDigital();}
 	else {displayAlarmMilitary();}
 }
 void incrementAlarmMinutes(){
 	// handler for button press to update alarm minutes
-	++alarm_minutes;
+	if (increment_mode == INCREMENT) {
+		alarm_minutes = (alarm_minutes + 1) % MINUTES_PER_HOUR;
+	}
+	else {alarm_minutes = (alarm_minutes + 59) % MINUTES_PER_HOUR;}
 	if (display_mode != MILITARY) {displayAlarmDigital();}
 	else {displayAlarmMilitary();}
 }
 void incrementTimeHours(){
 	// handler for button press to update time hours
-	++time_hours;
+	if (increment_mode == INCREMENT)
+		time_hours = (time_hours + 1) % HOURS_PER_DAY;
+	else 
+		time_hours = (time_hours + 23) % HOURS_PER_DAY;
+	analog_display_hours = time_hours;
+	if (time_hours >= 12){
+		analog_display_hours = time_hours -12;
+	}
 	if (display_mode != MILITARY) {displayDigital();}
 	else {displayMilitary();}
 }
 void incrementTimeMinutes(){
 	// handler for button press to update time minutes
-	++time_minutes;
+	if (increment_mode == INCREMENT)
+		time_minutes = (time_minutes + 1) % MINUTES_PER_HOUR;
+	else 
+		time_minutes = (time_minutes + 59) % MINUTES_PER_HOUR;
 	if (display_mode != MILITARY) {displayDigital();}
 	else {displayMilitary();}
 }
@@ -125,6 +165,7 @@ void setModePressed(){
 	// changes whether we're setting time, setting alarm, or neither
 	set_mode = (set_mode + 1 ) % NUM_SET_MODES;
 	if (set_mode == NONE){
+		hideIncrementMode();
 		if (wasAnalog){
 			enableAnalogDisplay();
 		}
@@ -136,7 +177,6 @@ void setModePressed(){
 		// set alarm mode
 		// disable real time screen updates
 		Clock_setDisplayFunction(0);  
-		
 		// display label
 		ST7735_FillRect(LABEL_X, LABEL_Y, LABEL_WIDTH, LABEL_HEIGHT, 0);
 		ST7735_SetCursor(3,13);
@@ -149,13 +189,11 @@ void setModePressed(){
 		} else {displayCurrentAlarmTimeMilitary();}
 		
 		// update H/M button functionality
+		displayIncrementMode();
 		incrementHours = &incrementAlarmHours;
 		incrementMinutes = &incrementAlarmMinutes;
 	} else {
 		// set time mode
-		
-		// clear screen
-		// ST7735_FillScreen(0);    
 		
 		// display label
 		ST7735_FillRect(LABEL_X, LABEL_Y, LABEL_WIDTH, LABEL_HEIGHT, 0);
@@ -176,6 +214,14 @@ void setModePressed(){
 		incrementHours = &incrementTimeHours;
 		incrementMinutes = &incrementTimeMinutes;
 	}
+}
+void resetToMainScreen(){
+	seconds_since_button_press = 0;
+	if (set_mode == NONE)
+		return;
+	if (set_mode == ALARM)
+		setModePressed();
+	setModePressed();
 }
 
 void hoursPressed(){
@@ -202,6 +248,7 @@ void CheckDebounce(buttonStatus* buttons, uint8_t numPorts){
 
 void GPIOPortD_Handler(void){
 	// handler for port D -- all 5 buttons
+	seconds_since_button_press = 0;
 	GPIO_PORTD_ICR_R = 0x4F;      // acknowledge flag 0-4
 	uint8_t i;
 	buttonStatus ports[5] = {

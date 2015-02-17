@@ -35,7 +35,7 @@ void drawClock(uint8_t drawDashes, uint8_t numToDraw) {
 	
 	//Need to draw hour/minute hands immediately upon drawing
 	ST7735_Line(CENTER_X, CENTER_Y, xVals[time_minutes], yVals[time_minutes], ST7735_Color565(0, 255, 0));
-	ST7735_Line(CENTER_X, CENTER_Y, xValsH[(time_hours*5)+(time_minutes/12)], yValsH[(time_hours*5)+(time_minutes/12)], ST7735_Color565(0, 0, 255));
+	ST7735_Line(CENTER_X, CENTER_Y, xValsH[(analog_display_hours*5)+(time_minutes/12)], yValsH[(analog_display_hours*5)+(time_minutes/12)], ST7735_Color565(0, 0, 255));
 }
 
 void displayCurrentAlarmTimeAnalog() {
@@ -91,7 +91,7 @@ void analogTime() {
 	//Now dealing with hours
 	//Will erase previous hour hand in case of an update
 	ST7735_Line(CENTER_X, CENTER_Y, xValsH[my_hourIncrementer], yValsH[my_hourIncrementer], ST7735_Color565(0, 0, 0));
-	my_hourIncrementer = (time_hours*5)+(time_minutes/12);
+	my_hourIncrementer = (analog_display_hours*5)+(time_minutes/12);
 	
 	ST7735_Line(CENTER_X, CENTER_Y, xValsH[my_hourIncrementer], yValsH[my_hourIncrementer], ST7735_Color565(0, 0, 255));
 	if (my_hourIncrementer >= MINUTES_PER_HOUR){

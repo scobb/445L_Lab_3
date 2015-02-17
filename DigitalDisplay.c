@@ -58,6 +58,8 @@ displayCell hourDisplayMap[] = {
 	{&drawBlank, &draw7},
 	{&drawBlank, &draw8},
 	{&drawBlank, &draw9},
+	{&draw1, &draw0},
+	{&draw1, &draw1},
 };
 displayCell minuteDisplayMap[] = {
 	{&draw0, &draw0}, {&draw0, &draw1}, {&draw0, &draw2}, {&draw0, &draw3}, {&draw0, &draw4},
@@ -79,7 +81,7 @@ void displayCurrentTimeDigital(){
 	uint8_t display_hours = time_hours;
 	(*minuteDisplayMap[time_minutes].left)(MINUTE_LEFT_X, ALL_Y);
 	(*minuteDisplayMap[time_minutes].right)(MINUTE_RIGHT_X, ALL_Y);
-	if (display_hours > 12)
+	if (display_hours >= 12)
 		display_hours -= 12;
 	(*hourDisplayMap[display_hours].left)(HOUR_LEFT_X, ALL_Y);
 	(*hourDisplayMap[display_hours].right)(HOUR_RIGHT_X, ALL_Y);
@@ -96,7 +98,7 @@ void displayCurrentAlarmTimeDigital(){
 	uint8_t display_hours = alarm_hours;
 	(*minuteDisplayMap[alarm_minutes].left)(MINUTE_LEFT_X, ALL_Y);
 	(*minuteDisplayMap[alarm_minutes].right)(MINUTE_RIGHT_X, ALL_Y);
-	if (display_hours > 12)
+	if (display_hours >= 12)
 		display_hours -= 12;
 	(*hourDisplayMap[display_hours].left)(HOUR_LEFT_X, ALL_Y);
 	(*hourDisplayMap[display_hours].right)(HOUR_RIGHT_X, ALL_Y);
@@ -122,9 +124,8 @@ void enableDigitalDisplay(){
 
 uint16_t redraw_alarm_minutes(uint8_t left, uint8_t right, uint16_t my_minutes){
 	if (my_minutes != alarm_minutes){
-		if (alarm_minutes % 10 == 0){
+		if (alarm_minutes % 10 == 0 || alarm_minutes % 10 == 9)
 			(*minuteDisplayMap[alarm_minutes].left)(left, ALL_Y);
-		}
 		(*minuteDisplayMap[alarm_minutes].right)(right, ALL_Y);
 		return alarm_minutes;
 	}
@@ -135,7 +136,7 @@ uint16_t redraw_alarm_hours(uint8_t left, uint8_t right, uint16_t my_hours, uint
 	uint8_t drawn_hours = alarm_hours;
 	displayCell* myMap;
 	if (!is_military) {
-		if (alarm_hours > 12){
+		if (alarm_hours >= 12){
 			drawn_hours = alarm_hours - 12;
 		}
 		myMap = hourDisplayMap;
@@ -168,7 +169,7 @@ void displayAlarmDigital(){
 
 uint16_t redraw_minutes(uint8_t left, uint8_t right, uint16_t my_minutes){
 	if (my_minutes != time_minutes){
-		if (time_minutes % 10 == 0){
+		if (time_minutes % 10 == 0 || time_minutes % 10 == 9){
 			(*minuteDisplayMap[time_minutes].left)(left, ALL_Y);
 		}
 		(*minuteDisplayMap[time_minutes].right)(right, ALL_Y);
@@ -182,7 +183,7 @@ uint16_t redraw_hours(uint8_t left, uint8_t right, uint16_t my_hours, uint8_t is
 	uint8_t drawn_hours = time_hours;
 	displayCell* myMap;
 	if (!is_military) {
-		if (time_hours > 12){
+		if (time_hours >= 12){
 			drawn_hours = time_hours - 12;
 		}
 		myMap = hourDisplayMap;
